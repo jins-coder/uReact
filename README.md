@@ -33,6 +33,7 @@ Standard React requires writing significant boilerplate and navigating tricky ho
 11. **Time-Travel Stores (`createHistoryStore`, `useHistoryStore`)**: Undo/redo history timeline with zero configuration.
 12. **Declarative Control Flow (`<Show>`, `<When>`, `<For>`, `<Fetch>`)**: Clean, readable conditional and list rendering without nested ternaries or manual `.map()` empty checks.
 13. **Interactive In-Browser Live Playground**: Edit, run, and inspect reactive uReact code live directly in documentation without build tools.
+14. **Zero Lock-In & 100% External Interoperability**: While uReact provides its own complete high-performance state management package (`createStore`, `signal`, `computed`, `createFormStore`, `createHistoryStore`), you are completely free to use external libraries like **Zustand**, **Redux Toolkit**, or **Jotai** side-by-side with zero friction. You can even bridge external stores into the Quantum DevTools HUD via `registerDevTools`.
 
 
 ---

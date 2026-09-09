@@ -4,6 +4,11 @@
   "description": "Rich IntelliSense, autocomplete snippets, reactive state scaffolding, hover docs, and UX tools for uReact.",
   "version": "2.3.0",
   "publisher": "ureact",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ureact/ureact"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -72,9 +77,11 @@
     ]
   },
   "scripts": {
-    "build": "tsc -p ./tsconfig.json"
+    "build": "tsc -p ./tsconfig.json",
+    "package": "npx @vscode/vsce package --allow-missing-repository"
   },
   "devDependencies": {
-    "@types/vscode": "^1.136.0"
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.9.2"
   }
 }

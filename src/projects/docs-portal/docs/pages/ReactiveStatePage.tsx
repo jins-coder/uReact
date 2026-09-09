@@ -4,7 +4,7 @@ import { Callout } from '../../components/Callout';
 import { YouWillLearn } from '../../components/YouWillLearn';
 import { ReactDevChallenge } from '../../components/ReactDevChallenge';
 import { StateDemo } from '../../examples/StateDemo';
-import { Sparkles, Layers, RefreshCw, Cpu } from 'lucide-react';
+import { Sparkles, Layers, RefreshCw, Cpu, Boxes, ArrowRightLeft, CheckCircle2, Share2 } from 'lucide-react';
 
 export function ReactiveStatePage() {
   return (
@@ -97,6 +97,105 @@ batch(() => {
 
       {/* Embedded Live Interactive Widget */}
       <StateDemo />
+
+      <h2 id="external-state" style={{ marginTop: '48px' }}>
+        4. Built-in State Package &amp; External State Interoperability
+      </h2>
+      <p>
+        <strong>uReact includes its own complete, zero-dependency reactive state management engine</strong> (<code>createStore</code>, <code>signal</code>, <code>computed</code>, <code>createFormStore</code>, <code>createHistoryStore</code>). However, uReact has a <em>zero lock-in</em> philosophy:
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '16px',
+        margin: '24px 0'
+      }}>
+        <div style={{
+          background: 'rgba(56, 189, 248, 0.05)',
+          border: '1px solid rgba(56, 189, 248, 0.2)',
+          borderRadius: '12px',
+          padding: '20px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: '#38bdf8' }}>
+            <Cpu size={20} />
+            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>1. Built-in State Package</h4>
+          </div>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            Use uReact's native <code>createStore</code> and <code>signal</code> when starting new apps. You get direct mutations, micro-batched updates, property-level tracking, and automatic Quantum DevTools telemetry without installing extra libraries.
+          </p>
+        </div>
+
+        <div style={{
+          background: 'rgba(168, 85, 247, 0.05)',
+          border: '1px solid rgba(168, 85, 247, 0.2)',
+          borderRadius: '12px',
+          padding: '20px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: '#c084fc' }}>
+            <ArrowRightLeft size={20} />
+            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>2. 100% External Friendly</h4>
+          </div>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            Have an existing codebase with <strong>Zustand</strong>, <strong>Redux Toolkit</strong>, <strong>Jotai</strong>, or <strong>TanStack Store</strong>? They work seamlessly in uReact with zero wrappers. You can mix and match without conflict.
+          </p>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: '18px', marginTop: '24px' }}>Example: Using Zustand or Redux with uReact</h3>
+      <p>
+        Because uReact adheres to React 19 standards, external state management libraries work side-by-side with uReact components:
+      </p>
+
+      <CodeBlock
+        code={`// 1. External Zustand Store (Legacy or team preference)
+import { create } from 'zustand';
+import { useStore as useExternalStore } from 'zustand';
+
+export const useAuthStore = create((set) => ({
+  user: { name: 'Sarah', role: 'Engineer' },
+  setUser: (user) => set({ user })
+}));
+
+// 2. uReact Native Component reading both external & internal state:
+import { createStore, useStore } from 'ureact';
+
+const uiStore = createStore({
+  sidebarOpen: false,
+  toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; }
+});
+
+export function DashboardHeader() {
+  const authUser = useAuthStore((s) => s.user); // External Zustand
+  const ui = useStore(uiStore);                  // Built-in uReact Proxy
+
+  return (
+    <header>
+      <button onClick={() => ui.toggleSidebar()}>Toggle</button>
+      <span>Welcome, {authUser.name}!</span>
+    </header>
+  );
+}`}
+        language="tsx"
+        title="Mixing External State with uReact"
+        showLineNumbers
+      />
+
+      <h3 style={{ fontSize: '18px', marginTop: '24px' }}>Connecting External Stores to uReact Quantum DevTools</h3>
+      <p>
+        You can even expose external stores to uReact's Quantum DevTools HUD using <code>registerDevTools</code>:
+      </p>
+
+      <CodeBlock
+        code={`import { registerDevTools } from 'ureact';
+import { useAuthStore } from './authStore';
+
+// Registers external store for live JSON inspection in the Quantum HUD:
+registerDevTools('ExternalAuthStore', 'store', useAuthStore.getState());`}
+        language="tsx"
+        title="DevTools Bridge"
+        showLineNumbers
+      />
 
       {/* react.dev Challenges */}
       <h2 id="challenges" style={{ marginTop: '48px' }}>
