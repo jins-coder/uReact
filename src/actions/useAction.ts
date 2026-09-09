@@ -94,5 +94,11 @@ export function useAction<TInput, TOutput>(
  * Access pending status from any nested component inside a React 19 form action.
  */
 export function useActionStatus() {
-  return useFormStatus();
+  try {
+    const status = useFormStatus();
+    return status || { pending: false, data: null, method: null, action: null };
+  } catch {
+    return { pending: false, data: null, method: null, action: null };
+  }
 }
+

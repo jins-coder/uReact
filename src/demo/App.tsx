@@ -26,6 +26,7 @@ import { QueryDemo } from './examples/QueryDemo';
 import { React19Demo } from './examples/React19Demo';
 import { BoilerplateDemo } from './examples/BoilerplateDemo';
 import { ShortcutMenuModal } from './components/ShortcutMenuModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'query' | 'react19' | 'reduction' | 'underTheHood' | 'quickstart'>('state');
@@ -193,14 +194,16 @@ export function App() {
 
         {/* Tab Panels */}
         <main className="panel">
-          {activeTab === 'state' && <StateDemo />}
-          {activeTab === 'form' && <FormDemo />}
-          {activeTab === 'async' && <AsyncDemo />}
-          {activeTab === 'flow' && <ControlFlowDemo />}
-          {activeTab === 'history' && <HistoryDemo />}
-          {activeTab === 'query' && <QueryDemo />}
-          {activeTab === 'react19' && <React19Demo />}
-          {activeTab === 'reduction' && <BoilerplateDemo />}
+          <ErrorBoundary fallbackTitle="Tab Panel Error">
+            {activeTab === 'state' && <StateDemo />}
+            {activeTab === 'form' && <FormDemo />}
+            {activeTab === 'async' && <AsyncDemo />}
+            {activeTab === 'flow' && <ControlFlowDemo />}
+            {activeTab === 'history' && <HistoryDemo />}
+            {activeTab === 'query' && <QueryDemo />}
+            {activeTab === 'react19' && <React19Demo />}
+            {activeTab === 'reduction' && <BoilerplateDemo />}
+          </ErrorBoundary>
 
           {/* Under the Hood Deep Dive */}
           {activeTab === 'underTheHood' && (

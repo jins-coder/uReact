@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, startTransition } from 'react';
 import { useAction, useActionStatus, usePromise, Head } from 'ureact';
 import {
   Zap,
@@ -9,7 +9,8 @@ import {
   MessageSquare,
   Globe,
   Radio,
-  Clock
+  Clock,
+  RotateCcw
 } from 'lucide-react';
 
 interface Comment {
@@ -20,17 +21,19 @@ interface Comment {
   isOptimistic?: boolean;
 }
 
-// Child component testing React 19 useFormStatus
-function ActionSubmitButton() {
+// Child component testing React 19 useFormStatus safely
+function ActionSubmitButton({ isActionPending }: { isActionPending?: boolean }) {
   const status = useActionStatus();
+  const pending = status?.pending || isActionPending;
+
   return (
     <button
       type="submit"
-      disabled={status.pending}
+      disabled={pending}
       className="btn btn-primary"
       style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
     >
-      {status.pending ? (
+      {pending ? (
         <>
           <Loader2 size={16} className="animate-spin" /> Saving with React 19...
         </>
@@ -43,22 +46,36 @@ function ActionSubmitButton() {
   );
 }
 
-// Simulated promise for React 19 use(Promise) demo
+// Simulated promise generator for React 19 use(Promise) demo
 function createDataPromise() {
-  return new Promise<{ message: string; timestamp: string }>((resolve) => {
+  const promise = new Promise<{ message: string; timestamp: string }>((resolve) => {
     setTimeout(() => {
       resolve({
         message: 'Resolved via React 19 use(Promise) inside a Suspense boundary!',
         timestamp: new Date().toLocaleTimeString()
       });
-    }, 1200);
+    }, 800);
   });
-}
 
-let activePromise = createDataPromise();
+  const p: any = promise;
+  p.status = 'pending';
+  p.then(
+    (res: any) => {
+      p.status = 'fulfilled';
+      p.value = res;
+    },
+    (err: any) => {
+      p.status = 'rejected';
+      p.reason = err;
+    }
+  );
+  return p as Promise<{ message: string; timestamp: string }>;
+}
 
 function SuspendedResource({ promise }: { promise: Promise<any> }) {
   const result = usePromise(promise);
+  if (!result) return null;
+
   return (
     <div
       style={{
@@ -78,15 +95,10 @@ function SuspendedResource({ promise }: { promise: Promise<any> }) {
 }
 
 export function React19Demo() {
-  const [commentsList, setCommentsList] = useState<Comment[]>([
-    { id: '1', author: 'Dan', text: 'React 19 Actions and useOptimistic are incredible.', timestamp: '10:14 AM' },
-    { id: '2', author: 'Sophie', text: 'uReact makes the React 19 API 10x easier to write.', timestamp: '10:22 AM' }
-  ]);
-
   const [authorInput, setAuthorInput] = useState('Alex');
   const [commentInput, setCommentInput] = useState('');
-  const [pageTitle, setPageTitle] = useState('uReact v2.0 — Powered by React 19');
-  const [resourcePromise, setResourcePromise] = useState(activePromise);
+  const [pageTitle, setPageTitle] = useState('uReact v2.1 — Powered by React 19');
+  const [resourcePromise, setResourcePromise] = useState(() => createDataPromise());
 
   // React 19 useAction with automatic useOptimistic
   const action = useAction<
@@ -95,7 +107,7 @@ export function React19Demo() {
   >(
     async (prev, input) => {
       // Simulate server network latency
-      await new Promise((r) => setTimeout(r, 900));
+      await new Promise((r) => setTimeout(r, 800));
 
       const newComment: Comment = {
         id: Math.random().toString(36).substring(7),
@@ -104,11 +116,12 @@ export function React19Demo() {
         timestamp: new Date().toLocaleTimeString()
       };
 
-      const updated = [...prev, newComment];
-      setCommentsList(updated);
-      return updated;
+      return [...prev, newComment];
     },
-    commentsList,
+    [
+      { id: '1', author: 'Dan', text: 'React 19 Actions and useOptimistic are incredible.', timestamp: '10:14 AM' },
+      { id: '2', author: 'Sophie', text: 'uReact makes the React 19 API 10x easier to write.', timestamp: '10:22 AM' }
+    ],
     {
       // React 19 useOptimistic handler: instant UI feedback!
       optimisticUpdate: (prev, input) => [
@@ -132,10 +145,16 @@ export function React19Demo() {
     setCommentInput('');
   };
 
+  const handleRetriggerPromise = () => {
+    startTransition(() => {
+      setResourcePromise(createDataPromise());
+    });
+  };
+
   return (
     <div>
       {/* React 19 Native Document Metadata Hoisting */}
-      <Head title={pageTitle} description="uReact v2.0 powered natively by React 19 engine" />
+      <Head title={pageTitle} description="uReact v2.1 powered natively by React 19 engine" />
 
       <div className="panel-header">
         <div>
@@ -144,7 +163,7 @@ export function React19Demo() {
             React 19 Native Evolution (Actions, <code>useOptimistic</code>, <code>use(Promise)</code>, Metadata)
           </h3>
           <p className="panel-subtitle">
-            uReact v2.0 is built natively on top of <strong>React 19</strong>. Experience concurrent transitions, optimistic UI updates, zero-ceremony form actions, and native <code>&lt;head&gt;</code> document hoisting.
+            uReact is built natively on top of <strong>React 19</strong>. Experience concurrent transitions, optimistic UI updates, zero-ceremony form actions, and native <code>&lt;head&gt;</code> document hoisting.
           </p>
         </div>
         <div className="pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: 'var(--accent-cyan)' }}>
@@ -179,7 +198,7 @@ const [optimistic, setOptimistic] = useOptimistic(
 
         <div className="code-box ureact">
           <div className="code-box-header">
-            <span>uReact v2.0 (Unified useAction)</span>
+            <span>uReact v2.1 (Unified useAction)</span>
             <span className="code-box-badge badge-good">One Clean Hook</span>
           </div>
           <pre className="code-content">
@@ -206,7 +225,15 @@ const action = useAction(
             1. React 19 Actions &amp; Optimistic Comments
           </h4>
 
-          <form onSubmit={handleSubmit} style={{ marginBottom: '16px' }}>
+          <form
+            action={async () => {
+              if (!commentInput.trim()) return;
+              await action.run({ author: authorInput, text: commentInput });
+              setCommentInput('');
+            }}
+            onSubmit={handleSubmit}
+            style={{ marginBottom: '16px' }}
+          >
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '8px', marginBottom: '8px' }}>
               <input
                 type="text"
@@ -228,7 +255,7 @@ const action = useAction(
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 {action.isPending ? '⚡ React 19 Action Transitioning...' : 'Ready'}
               </span>
-              <ActionSubmitButton />
+              <ActionSubmitButton isActionPending={action.isPending} />
             </div>
           </form>
 
@@ -304,11 +331,11 @@ const action = useAction(
                 React 19 <code>use(Promise)</code> with &lt;Suspense&gt;:
               </span>
               <button
-                onClick={() => setResourcePromise(createDataPromise())}
+                onClick={handleRetriggerPromise}
                 className="btn btn-secondary"
-                style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                Re-trigger Promise
+                <RotateCcw size={12} /> Re-trigger Promise
               </button>
             </div>
 
@@ -325,7 +352,7 @@ const action = useAction(
                     fontSize: '0.85rem'
                   }}
                 >
-                  <Loader2 size={16} className="animate-spin" style={{ marginBottom: '4px' }} />
+                  <Loader2 size={16} className="animate-spin" style={{ marginBottom: '4px', margin: '0 auto 4px' }} />
                   <div>Suspended by React 19 use() hook... resolving promise</div>
                 </div>
               }

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 export interface HeadProps {
   title?: string;
@@ -13,6 +13,21 @@ export interface HeadProps {
  * to the document <head> without requiring external libraries like react-helmet!
  */
 export function Head({ title, description, children }: HeadProps) {
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (title) document.title = title;
+      if (description) {
+        let meta = document.querySelector('meta[name="description"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', 'description');
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', description);
+      }
+    }
+  }, [title, description]);
+
   return (
     <>
       {title && <title>{title}</title>}

@@ -15,5 +15,20 @@ import { use } from 'react';
  *   }
  */
 export function usePromise<T>(promise: Promise<T>): T {
+  const p = promise as any;
+  if (p && !p.status && typeof p.then === 'function') {
+    p.status = 'pending';
+    p.then(
+      (val: any) => {
+        p.status = 'fulfilled';
+        p.value = val;
+      },
+      (err: any) => {
+        p.status = 'rejected';
+        p.reason = err;
+      }
+    );
+  }
   return use(promise);
 }
+
