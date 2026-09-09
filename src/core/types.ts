@@ -1,0 +1,26 @@
+export type Listener = () => void;
+export type Unsubscribe = () => void;
+
+export interface Store<T extends object> {
+  state: T;
+  subscribe: (listener: Listener) => Unsubscribe;
+  getSnapshot: () => T;
+  reset: () => void;
+  /** Batch multiple mutations to trigger only one re-render */
+  batch: (fn: () => void) => void;
+}
+
+export interface Signal<T> {
+  value: T;
+  get: () => T;
+  set: (val: T | ((prev: T) => T)) => void;
+  update: (fn: (prev: T) => T) => void;
+  subscribe: (listener: Listener) => Unsubscribe;
+  getSnapshot: () => T;
+}
+
+export type Computed<T> = {
+  readonly value: T;
+  get: () => T;
+  subscribe: (listener: Listener) => Unsubscribe;
+};
