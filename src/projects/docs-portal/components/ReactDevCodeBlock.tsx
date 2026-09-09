@@ -1,17 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Highlight, type PrismTheme } from 'prism-react-renderer';
-import { Copy, Check } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  WrapText,
+  Maximize2,
+  Minimize2,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  ZoomIn,
+  ZoomOut,
+  Sparkles,
+  Terminal
+} from 'lucide-react';
 
 export interface ReactDevCodeProps {
   code: string;
   language?: string;
   title?: string;
   badge?: string;
-  badgeType?: 'bad' | 'good' | 'emerald' | 'neutral';
+  badgeType?: 'bad' | 'good' | 'emerald' | 'neutral' | 'react19';
   highlightLines?: number[];
   showLineNumbers?: boolean;
+  collapsible?: boolean;
+  initialCollapsed?: boolean;
+  maxLines?: number;
   className?: string;
   style?: React.CSSProperties;
+  onOpenPlayground?: (code: string) => void;
 }
 
 /**
@@ -64,7 +81,7 @@ export const reactDevLightTheme: PrismTheme = {
     {
       types: ['attr-name'],
       style: {
-        color: '#953800'
+        color: '#116329'
       }
     },
     {
@@ -169,29 +186,21 @@ export const reactDevDarkTheme: PrismTheme = {
       types: ['inserted'],
       style: {
         color: '#7ee787',
-        backgroundColor: 'rgba(126, 231, 135, 0.12)'
+        backgroundColor: 'rgba(56, 139, 253, 0.15)'
       }
     },
     {
       types: ['deleted'],
       style: {
-        color: '#ff7b72',
-        backgroundColor: 'rgba(255, 123, 114, 0.12)'
+        color: '#ffa198',
+        backgroundColor: 'rgba(248, 81, 73, 0.15)'
       }
     }
   ]
 };
 
-/**
- * Hook to reactively observe document theme changes
- */
 function usePortalTheme(): 'light' | 'dark' {
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof document !== 'undefined') {
-      return (document.documentElement.getAttribute('data-theme') as 'light' | 'dark') || 'light';
-    }
-    return 'light';
-  });
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -211,7 +220,17 @@ function usePortalTheme(): 'light' | 'dark' {
 }
 
 /**
- * react.dev Authentic Code Block Component powered by prism-react-renderer
+ * Ultimate Beast ReactDevCodeBlock Component
+ * 
+ * Features:
+ * - Word Wrap toggle
+ * - Font zoom control (Compact / Normal / Large)
+ * - Interactive line selection & pinning
+ * - Git diff line recognition (+ / - markers)
+ * - Full-screen distraction-free modal
+ * - Code file download (.tsx / .ts / .jsx)
+ * - Auto folding for long snippets (>24 lines)
+ * - Compact single-line header chrome
  */
 export function ReactDevCodeBlock({
   code,
@@ -221,17 +240,65 @@ export function ReactDevCodeBlock({
   badgeType = 'neutral',
   highlightLines = [],
   showLineNumbers = false,
+  collapsible = false,
+  initialCollapsed = false,
+  maxLines = 26,
   className = '',
   style = {}
 }: ReactDevCodeProps) {
   const themeMode = usePortalTheme();
   const [copied, setCopied] = useState(false);
+  const [wordWrap, setWordWrap] = useState(false);
+  const [fontSizeStep, setFontSizeStep] = useState<0 | 1 | 2>(1); // 0=compact, 1=regular, 2=large
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!initialCollapsed);
+  const [pinnedLines, setPinnedLines] = useState<Set<number>>(new Set());
+
+  const trimmedCode = code.trim();
+  const lineCount = useMemo(() => trimmedCode.split('\n').length, [trimmedCode]);
+  const shouldFold = collapsible || (lineCount > maxLines && !isFullScreen);
+
+  // Close full screen on Escape key
+  useEffect(() => {
+    if (!isFullScreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullScreen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreen]);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(trimmedCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleDownload = () => {
+    const ext = language.toLowerCase() === 'typescript' || language.toLowerCase() === 'ts' ? 'ts' : 'tsx';
+    const filename = (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'snippet') + `.${ext}`;
+    const blob = new Blob([trimmedCode], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const toggleLinePin = (lineNum: number) => {
+    setPinnedLines((prev) => {
+      const next = new Set(prev);
+      if (next.has(lineNum)) next.delete(lineNum);
+      else next.add(lineNum);
+      return next;
+    });
+  };
+
+  const fontSizes = ['0.76rem', '0.83rem', '0.92rem'];
+  const activeFontSize = fontSizes[fontSizeStep];
 
   const activePrismTheme = themeMode === 'dark' ? reactDevDarkTheme : reactDevLightTheme;
 
@@ -251,6 +318,11 @@ export function ReactDevCodeBlock({
       color: 'var(--accent-emerald, #059669)',
       border: 'rgba(16, 185, 129, 0.25)'
     },
+    react19: {
+      bg: 'rgba(88, 196, 220, 0.15)',
+      color: 'var(--accent-cyan)',
+      border: 'rgba(88, 196, 220, 0.3)'
+    },
     neutral: {
       bg: 'var(--bg-secondary)',
       color: 'var(--text-muted)',
@@ -269,21 +341,24 @@ export function ReactDevCodeBlock({
     ? 'bash'
     : language.toLowerCase();
 
-  return (
+  const codeBlockJSX = (
     <div
       className={`react-dev-code-box ${className}`}
       style={{
-        margin: '16px 0',
-        borderRadius: '12px',
+        margin: isFullScreen ? 0 : '16px 0',
+        borderRadius: isFullScreen ? '16px' : '12px',
         border: '1px solid var(--code-border, #e5e7eb)',
         background: activePrismTheme.plain.backgroundColor,
         overflow: 'hidden',
         boxShadow: themeMode === 'light' ? '0 1px 3px rgba(0, 0, 0, 0.05)' : '0 4px 20px rgba(0, 0, 0, 0.4)',
         transition: 'all 0.2s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        height: isFullScreen ? '90vh' : 'auto',
         ...style
       }}
     >
-      {/* Header Chrome */}
+      {/* Beast Header Chrome */}
       <div
         style={{
           display: 'flex',
@@ -297,8 +372,9 @@ export function ReactDevCodeBlock({
           gap: '8px'
         }}
       >
+        {/* Left Side: Window Dots + Title + Line Count */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: '1 1 auto' }}>
-          {/* react.dev Window Dots */}
+          {/* Authentic Window Dots */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f56', display: 'inline-block' }} />
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffbd2e', display: 'inline-block' }} />
@@ -321,9 +397,26 @@ export function ReactDevCodeBlock({
           >
             {title || cleanLang.toUpperCase()}
           </span>
+
+          <span
+            style={{
+              fontSize: '0.65rem',
+              padding: '1px 5px',
+              borderRadius: '4px',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-dim)',
+              border: '1px solid var(--border-subtle)',
+              fontFamily: 'var(--font-mono)',
+              flexShrink: 0
+            }}
+          >
+            {lineCount}L
+          </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+        {/* Right Side Action Tools */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+          {/* Badge */}
           {badge && (
             <span
               style={{
@@ -344,6 +437,92 @@ export function ReactDevCodeBlock({
             </span>
           )}
 
+          {/* Word Wrap Toggle */}
+          <button
+            onClick={() => setWordWrap(!wordWrap)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '24px',
+              height: '24px',
+              borderRadius: '5px',
+              background: wordWrap ? 'var(--accent-cyan-bg)' : 'transparent',
+              border: '1px solid',
+              borderColor: wordWrap ? 'var(--accent-cyan)' : 'var(--border-subtle)',
+              color: wordWrap ? 'var(--accent-cyan)' : 'var(--text-dim)',
+              cursor: 'pointer',
+              transition: 'all 0.12s ease'
+            }}
+            title={wordWrap ? 'Word Wrap: ON' : 'Word Wrap: OFF'}
+          >
+            <WrapText size={12} />
+          </button>
+
+          {/* Font Zoom Cycler */}
+          <button
+            onClick={() => setFontSizeStep(((fontSizeStep + 1) % 3) as any)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '24px',
+              height: '24px',
+              borderRadius: '5px',
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-dim)',
+              cursor: 'pointer',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)'
+            }}
+            title={`Font Size: ${fontSizeStep === 0 ? 'Compact' : fontSizeStep === 1 ? 'Standard' : 'Large'}`}
+          >
+            {fontSizeStep === 0 ? 'A-' : fontSizeStep === 1 ? 'A' : 'A+'}
+          </button>
+
+          {/* Download snippet */}
+          <button
+            onClick={handleDownload}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '24px',
+              height: '24px',
+              borderRadius: '5px',
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-dim)',
+              cursor: 'pointer'
+            }}
+            title="Download file"
+          >
+            <Download size={12} />
+          </button>
+
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={() => setIsFullScreen(!isFullScreen)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '24px',
+              height: '24px',
+              borderRadius: '5px',
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-dim)',
+              cursor: 'pointer'
+            }}
+            title={isFullScreen ? 'Exit full screen (Esc)' : 'Expand full screen'}
+          >
+            {isFullScreen ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+          </button>
+
+          {/* Copy Button */}
           <button
             onClick={handleCopy}
             style={{
@@ -352,16 +531,18 @@ export function ReactDevCodeBlock({
               gap: '4px',
               padding: '3px 8px',
               borderRadius: '5px',
-              background: 'var(--bg-card-hover)',
-              border: '1px solid var(--border-subtle)',
-              color: 'var(--text-muted)',
+              background: copied ? 'var(--accent-cyan-bg)' : 'var(--bg-card-hover)',
+              border: '1px solid',
+              borderColor: copied ? 'var(--accent-cyan)' : 'var(--border-subtle)',
+              color: copied ? 'var(--accent-cyan)' : 'var(--text-main)',
               fontSize: '0.68rem',
+              fontWeight: 600,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
               flexShrink: 0,
               transition: 'all 0.15s ease'
             }}
-            title="Copy code to clipboard"
+            title="Copy code (Ctrl+C)"
           >
             {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} />}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
@@ -370,78 +551,212 @@ export function ReactDevCodeBlock({
       </div>
 
       {/* Code Body via prism-react-renderer */}
-      <Highlight
-        theme={activePrismTheme}
-        code={code.trim()}
-        language={cleanLang as any}
+      <div
+        style={{
+          position: 'relative',
+          flex: 1,
+          maxHeight: shouldFold && !isExpanded ? '320px' : 'none',
+          overflow: 'hidden'
+        }}
       >
-        {({ className: prismClass, style: prismStyle, tokens, getLineProps, getTokenProps }) => (
-          <pre
-            className={`code-content ${prismClass}`}
+        <Highlight
+          theme={activePrismTheme}
+          code={trimmedCode}
+          language={cleanLang as any}
+        >
+          {({ className: prismClass, style: prismStyle, tokens, getLineProps, getTokenProps }) => (
+            <pre
+              className={`code-content ${prismClass}`}
+              style={{
+                ...prismStyle,
+                margin: 0,
+                padding: '12px 0',
+                fontFamily: 'var(--font-mono)',
+                fontSize: activeFontSize,
+                lineHeight: '1.65',
+                overflowX: wordWrap ? 'hidden' : 'auto',
+                whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
+                wordBreak: wordWrap ? 'break-word' : 'normal',
+                background: 'transparent',
+                height: isFullScreen ? 'calc(90vh - 80px)' : 'auto',
+                overflowY: isFullScreen ? 'auto' : 'visible'
+              }}
+            >
+              <code>
+                {tokens.map((line, idx) => {
+                  const lineNum = idx + 1;
+                  const isHighlighted = highlightLines.includes(lineNum) || pinnedLines.has(lineNum);
+                  const lineText = line.map(t => t.content).join('');
+
+                  // Git Diff detection
+                  const isDiffAdd = lineText.trim().startsWith('+');
+                  const isDiffRemove = lineText.trim().startsWith('-');
+
+                  const lineProps = getLineProps({ line, key: idx });
+
+                  let lineBg = 'transparent';
+                  let borderLeft = '3px solid transparent';
+
+                  if (isHighlighted) {
+                    lineBg = themeMode === 'light' ? 'rgba(2, 132, 199, 0.08)' : 'rgba(56, 189, 248, 0.12)';
+                    borderLeft = `3px solid ${themeMode === 'light' ? '#0284c7' : '#38bdf8'}`;
+                  } else if (isDiffAdd) {
+                    lineBg = themeMode === 'light' ? 'rgba(16, 185, 129, 0.09)' : 'rgba(16, 185, 129, 0.15)';
+                    borderLeft = '3px solid #10b981';
+                  } else if (isDiffRemove) {
+                    lineBg = themeMode === 'light' ? 'rgba(244, 63, 94, 0.09)' : 'rgba(244, 63, 94, 0.15)';
+                    borderLeft = '3px solid #f43f5e';
+                  }
+
+                  return (
+                    <div
+                      {...lineProps}
+                      key={idx}
+                      onClick={() => toggleLinePin(lineNum)}
+                      style={{
+                        display: 'flex',
+                        padding: '0 14px',
+                        background: lineBg,
+                        borderLeft,
+                        paddingLeft: (isHighlighted || isDiffAdd || isDiffRemove) ? '11px' : '14px',
+                        transition: 'background-color 0.12s ease',
+                        cursor: 'pointer'
+                      }}
+                      title="Click line to toggle highlight"
+                    >
+                      {showLineNumbers && (
+                        <span
+                          style={{
+                            width: '24px',
+                            flexShrink: 0,
+                            textAlign: 'right',
+                            marginRight: '14px',
+                            color: isHighlighted ? 'var(--accent-cyan)' : (themeMode === 'light' ? '#94a3b8' : '#64748b'),
+                            userSelect: 'none',
+                            fontSize: '0.72rem',
+                            opacity: isHighlighted ? 1 : 0.6,
+                            fontFamily: 'var(--font-mono)'
+                          }}
+                        >
+                          {lineNum}
+                        </span>
+                      )}
+                      <span style={{ flex: 1 }}>
+                        {line.map((token, key) => (
+                          <span {...getTokenProps({ token, key })} key={key} />
+                        ))}
+                      </span>
+                    </div>
+                  );
+                })}
+              </code>
+            </pre>
+          )}
+        </Highlight>
+
+        {/* Collapsible Gradient Overlay when code is folded */}
+        {shouldFold && !isExpanded && (
+          <div
             style={{
-              ...prismStyle,
-              margin: 0,
-              padding: '14px 0',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.84rem',
-              lineHeight: '1.7',
-              overflowX: 'auto',
-              background: 'transparent'
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '80px',
+              background: themeMode === 'light'
+                ? 'linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.95))'
+                : 'linear-gradient(to bottom, transparent, rgba(22, 24, 29, 0.95))',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              paddingBottom: '10px'
             }}
           >
-            <code>
-              {tokens.map((line, idx) => {
-                const lineNum = idx + 1;
-                const isHighlighted = highlightLines.includes(lineNum);
-                const lineProps = getLineProps({ line, key: idx });
-
-                return (
-                  <div
-                    {...lineProps}
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      padding: '0 16px',
-                      background: isHighlighted
-                        ? themeMode === 'light'
-                          ? 'rgba(2, 132, 199, 0.08)'
-                          : 'rgba(56, 189, 248, 0.12)'
-                        : 'transparent',
-                      borderLeft: isHighlighted
-                        ? `3px solid ${themeMode === 'light' ? '#0284c7' : '#38bdf8'}`
-                        : '3px solid transparent',
-                      paddingLeft: isHighlighted ? '13px' : '16px',
-                      transition: 'background-color 0.15s ease'
-                    }}
-                  >
-                    {showLineNumbers && (
-                      <span
-                        style={{
-                          width: '26px',
-                          flexShrink: 0,
-                          textAlign: 'right',
-                          marginRight: '16px',
-                          color: themeMode === 'light' ? '#94a3b8' : '#64748b',
-                          userSelect: 'none',
-                          fontSize: '0.75rem',
-                          opacity: 0.6
-                        }}
-                      >
-                        {lineNum}
-                      </span>
-                    )}
-                    <span style={{ flex: 1, whiteSpace: 'pre' }}>
-                      {line.map((token, key) => (
-                        <span {...getTokenProps({ token, key })} key={key} />
-                      ))}
-                    </span>
-                  </div>
-                );
-              })}
-            </code>
-          </pre>
+            <button
+              onClick={() => setIsExpanded(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--accent-cyan)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <ChevronDown size={14} />
+              <span>Expand Code ({lineCount} lines)</span>
+            </button>
+          </div>
         )}
-      </Highlight>
+      </div>
+
+      {/* Fold Collapse toggle footer when expanded */}
+      {shouldFold && isExpanded && (
+        <div
+          style={{
+            padding: '6px 14px',
+            background: themeMode === 'light' ? '#f8fafc' : 'rgba(255, 255, 255, 0.02)',
+            borderTop: '1px solid var(--code-border, #e5e7eb)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <button
+            onClick={() => setIsExpanded(false)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-dim)',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            <ChevronUp size={13} />
+            <span>Collapse Code</span>
+          </button>
+        </div>
+      )}
     </div>
   );
+
+  if (isFullScreen) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 99999,
+          background: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px'
+        }}
+        onClick={() => setIsFullScreen(false)}
+      >
+        <div
+          style={{ width: '100%', maxWidth: '1080px' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {codeBlockJSX}
+        </div>
+      </div>
+    );
+  }
+
+  return codeBlockJSX;
 }
