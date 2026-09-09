@@ -26,13 +26,39 @@ export const DOC_CATEGORIES: DocCategory[] = [
         id: 'quickstart',
         path: '/docs/quickstart',
         title: 'Quickstart & Architecture',
-        badge: 'v2.1',
+        badge: 'v2.2',
         badgeType: 'core',
         description: 'Install uReact, understand the architecture, and build your first component.',
         toc: [
           { id: 'installation', text: '1. Installation' },
           { id: 'first-component', text: '2. First Component' },
           { id: 'architecture', text: '3. Architecture Deep-Dive' }
+        ]
+      },
+      {
+        id: 'playground',
+        path: '/docs/playground',
+        title: 'Live Code Playground',
+        badge: 'Live Sandbox',
+        badgeType: 'new',
+        description: 'Experiment with Signals v2, $bind, and React 19 ActionForm live in browser.',
+        toc: [
+          { id: 'signals-preset', text: '1. Signals v2 Preset' },
+          { id: 'binding-preset', text: '2. Form Auto-Binding' },
+          { id: 'actions-preset', text: '3. React 19 Action Form' }
+        ]
+      },
+      {
+        id: 'roadmap',
+        path: '/docs/roadmap',
+        title: 'Next Version & Roadmap',
+        badge: 'v2.2-next',
+        badgeType: 'react19',
+        description: 'What is new in v2.2.0-next Canary, Signals v2, and upcoming v3.0 RFCs.',
+        toc: [
+          { id: 'v22-features', text: '1. v2.2.0 Features' },
+          { id: 'v30-rfcs', text: '2. v3.0 RFCs' },
+          { id: 'changelog', text: '3. Release History' }
         ]
       }
     ]

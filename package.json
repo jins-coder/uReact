@@ -1,6 +1,6 @@
 {
   "name": "ureact",
-  "version": "2.1.0",
+  "version": "2.2.0-next",
   "description": "A developer-first reactive framework built on top of React to eliminate hook boilerplate and simplify state, forms, and async flows.",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -23,11 +23,16 @@ import { ControlFlowPage } from './docs/pages/ControlFlowPage';
 import { TimeTravelPage } from './docs/pages/TimeTravelPage';
 import { HooksReferencePage } from './docs/pages/HooksReferencePage';
 import { CodeReducerLabPage } from './docs/pages/CodeReducerLabPage';
+import { PlaygroundPage } from './docs/pages/PlaygroundPage';
+import { RoadmapPage } from './docs/pages/RoadmapPage';
+import { RoadmapModal } from './components/RoadmapModal';
 
 export function App() {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentVersion, setCurrentVersion] = useState<'2.2.0-next' | '2.1.0' | '2.0.0'>('2.2.0-next');
+  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
 
   // Theme state: defaults to light theme (clean react.dev white palette)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -113,6 +118,10 @@ export function App() {
         return <HooksReferencePage />;
       case 'code-reducer':
         return <CodeReducerLabPage />;
+      case 'playground':
+        return <PlaygroundPage />;
+      case 'roadmap':
+        return <RoadmapPage />;
       default:
         return <QuickstartPage />;
     }
@@ -141,6 +150,9 @@ export function App() {
         onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
         theme={theme}
         onToggleTheme={toggleTheme}
+        currentVersion={currentVersion}
+        onSelectVersion={(v) => setCurrentVersion(v as any)}
+        onOpenRoadmap={() => setIsRoadmapOpen(true)}
       />
 
       {/* 3-Column React.dev Documentation Layout */}
@@ -238,6 +250,17 @@ export function App() {
         canRedo={canvasStore.canRedo}
         theme={theme}
         onToggleTheme={toggleTheme}
+        currentVersion={currentVersion}
+        onSelectVersion={(v) => setCurrentVersion(v as any)}
+        onOpenRoadmap={() => setIsRoadmapOpen(true)}
+      />
+
+      {/* Roadmap & Releases Modal */}
+      <RoadmapModal
+        isOpen={isRoadmapOpen}
+        onClose={() => setIsRoadmapOpen(false)}
+        currentVersion={currentVersion}
+        onSelectVersion={(v) => setCurrentVersion(v as any)}
       />
     </div>
   );

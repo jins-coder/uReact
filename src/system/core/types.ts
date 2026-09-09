@@ -34,10 +34,13 @@ export interface Signal<T> {
   update: (fn: (prev: T) => T) => void;
   subscribe: (listener: Listener) => Unsubscribe;
   getSnapshot: () => T;
+  peek: () => T;
 }
 
-export type Computed<T> = {
+export interface Computed<T> {
   readonly value: T;
   get: () => T;
   subscribe: (listener: Listener) => Unsubscribe;
-};
+  getSnapshot: () => T;
+  peek: () => T;
+}

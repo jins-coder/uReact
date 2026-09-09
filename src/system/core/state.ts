@@ -1,5 +1,5 @@
-import { useSyncExternalStore, useRef, useCallback, useEffect } from 'react';
-import { Listener, Store, Signal, Unsubscribe } from './types';
+import { useSyncExternalStore, useRef, useCallback, useEffect, useMemo } from 'react';
+import { Listener, Store, Signal, Computed, Unsubscribe } from './types';
 import { trackStoreAccess, notifyTrackedStores } from './view';
 import { bind } from './bind';
 
@@ -198,32 +198,48 @@ export function useLocalStore<T extends object>(initialState: T | (() => T)): T 
   return useStore(storeRef.current);
 }
 
+let activeSubscriber: Listener | null = null;
+const subscriberStack: (Listener | null)[] = [];
+
+export function pushSubscriber(sub: Listener | null) {
+  subscriberStack.push(activeSubscriber);
+  activeSubscriber = sub;
+}
+
+export function popSubscriber() {
+  activeSubscriber = subscriberStack.pop() ?? null;
+}
+
 /**
- * Lightweight primitive Signal for single reactive values
+ * Signals v2: Fine-grained reactive signal for single values with dependency tracking
  */
 export function signal<T>(initialValue: T): Signal<T> {
   let val = initialValue;
   const listeners = new Set<Listener>();
 
-  return {
+  const sig: Signal<T> = {
     get value() {
+      if (activeSubscriber) {
+        listeners.add(activeSubscriber);
+      }
       return val;
     },
     set value(newVal: T) {
-      if (val !== newVal) {
+      if (!Object.is(val, newVal)) {
         val = newVal;
-        listeners.forEach(l => l());
+        const copy = Array.from(listeners);
+        for (const l of copy) l();
       }
     },
-    get() {
+    peek() {
       return val;
+    },
+    get() {
+      return this.value;
     },
     set(newVal: T | ((prev: T) => T)) {
       const next = typeof newVal === 'function' ? (newVal as (prev: T) => T)(val) : newVal;
-      if (val !== next) {
-        val = next;
-        listeners.forEach(l => l());
-      }
+      this.value = next;
     },
     update(fn: (prev: T) => T) {
       this.set(fn);
@@ -236,12 +252,129 @@ export function signal<T>(initialValue: T): Signal<T> {
       return val;
     }
   };
+
+  return sig;
 }
 
 /**
- * Hook to subscribe to a Signal
+ * Signals v2: Lazily evaluated memoized computed signal with automatic dependency tracking
  */
-export function useSignal<T>(sig: Signal<T>): [T, (val: T | ((prev: T) => T)) => void, Signal<T>] {
+export function computed<T>(getter: () => T): Computed<T> {
+  let cachedValue: T;
+  let dirty = true;
+  const listeners = new Set<Listener>();
+  const cleanups: Unsubscribe[] = [];
+
+  const evaluate = (): T => {
+    for (const c of cleanups) c();
+    cleanups.length = 0;
+
+    pushSubscriber(() => {
+      dirty = true;
+      const copy = Array.from(listeners);
+      for (const l of copy) l();
+    });
+
+    try {
+      cachedValue = getter();
+      dirty = false;
+    } finally {
+      popSubscriber();
+    }
+    return cachedValue;
+  };
+
+  return {
+    get value() {
+      if (dirty) {
+        evaluate();
+      }
+      if (activeSubscriber) {
+        listeners.add(activeSubscriber);
+      }
+      return cachedValue;
+    },
+    get() {
+      return this.value;
+    },
+    peek() {
+      if (dirty) {
+        evaluate();
+      }
+      return cachedValue;
+    },
+    subscribe(listener: Listener): Unsubscribe {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    getSnapshot() {
+      return this.value;
+    }
+  };
+}
+
+/**
+ * Creates an effect that runs immediately and auto-subscribes to all signals accessed during execution.
+ */
+export function createSignalEffect(fn: () => void | (() => void)): Unsubscribe {
+  let cleanup: void | (() => void);
+  let disposed = false;
+
+  const run = () => {
+    if (disposed) return;
+    if (typeof cleanup === 'function') {
+      try {
+        cleanup();
+      } catch (err) {
+        console.error('[uReact Signals] Cleanup error:', err);
+      }
+    }
+
+    pushSubscriber(run);
+    try {
+      cleanup = fn();
+    } finally {
+      popSubscriber();
+    }
+  };
+
+  run();
+
+  return () => {
+    disposed = true;
+    if (typeof cleanup === 'function') {
+      try {
+        cleanup();
+      } catch (err) {
+        console.error('[uReact Signals] Cleanup error:', err);
+      }
+    }
+  };
+}
+
+/**
+ * Hook to subscribe to a Signal or initialize a component-level signal
+ */
+export function useSignal<T>(
+  initialOrSignal: T | Signal<T>
+): [T, (val: T | ((prev: T) => T)) => void, Signal<T>] {
+  const signalRef = useRef<Signal<T> | null>(null);
+
+  if (!signalRef.current) {
+    if (
+      initialOrSignal &&
+      typeof initialOrSignal === 'object' &&
+      'subscribe' in initialOrSignal &&
+      'getSnapshot' in initialOrSignal
+    ) {
+      signalRef.current = initialOrSignal as Signal<T>;
+    } else {
+      signalRef.current = signal(initialOrSignal as T);
+    }
+  }
+
+  const sig = signalRef.current;
+
   const val = useSyncExternalStore(
     sig.subscribe,
     sig.getSnapshot,
@@ -253,6 +386,18 @@ export function useSignal<T>(sig: Signal<T>): [T, (val: T | ((prev: T) => T)) =>
   }, [sig]);
 
   return [val, setter, sig];
+}
+
+/**
+ * Hook to subscribe to a Computed Signal
+ */
+export function useComputed<T>(getter: () => T, deps: any[] = []): T {
+  const comp = useMemo(() => computed(getter), deps);
+  return useSyncExternalStore(
+    comp.subscribe,
+    comp.getSnapshot,
+    comp.getSnapshot
+  );
 }
 
 /**

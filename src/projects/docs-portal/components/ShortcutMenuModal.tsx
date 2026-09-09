@@ -43,6 +43,9 @@ export interface ShortcutMenuModalProps {
   canRedo?: boolean;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
+  currentVersion?: string;
+  onSelectVersion?: (version: string) => void;
+  onOpenRoadmap?: () => void;
 }
 
 export type PaletteItemType = 'doc' | 'hook' | 'action';
@@ -235,19 +238,88 @@ form.dark = false;`,
     _searchIndex: 'uselocalstore local store proxy state usestate'
   },
   {
-    id: 'hook-use-signal',
+    id: 'hook-signal',
     type: 'hook',
-    title: 'useSignal(signal)',
-    subtitle: 'Lightweight reactive scalar primitive with direct get/set',
+    title: 'signal(initialValue)',
+    subtitle: 'Signals v2 fine-grained reactive primitive with automatic dependency tracking',
     category: 'Core Reactivity',
-    badge: 'Signal',
+    badge: 'Signals v2',
     badgeType: 'core',
     icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
-    hookSignature: 'const [val, setVal, signal] = useSignal(scalarSignal);',
-    hookSnippet: `import { signal, useSignal } from 'ureact';
+    hookSignature: 'const count = signal<number>(0);',
+    hookSnippet: `import { signal } from 'ureact';
 
-const [count, setCount] = useSignal(countSignal);`,
-    _searchIndex: 'usesignal signal scalar reactivity fine grained'
+const count = signal(0);
+// Read: count.value or count.peek()
+// Write: count.value++ or count.set(v => v + 1)`,
+    _searchIndex: 'signal signals v2 reactivity primitive fine grained value peek'
+  },
+  {
+    id: 'hook-computed',
+    type: 'hook',
+    title: 'computed(getter)',
+    subtitle: 'Signals v2 lazily-evaluated memoized computed signal with auto-dependency tracking',
+    category: 'Core Reactivity',
+    badge: 'Signals v2',
+    badgeType: 'core',
+    icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+    hookSignature: 'const double = computed(() => count.value * 2);',
+    hookSnippet: `import { signal, computed } from 'ureact';
+
+const count = signal(2);
+const double = computed(() => count.value * 2);
+console.log(double.value); // 4`,
+    _searchIndex: 'computed memoized lazy signal derived dependency tracking'
+  },
+  {
+    id: 'hook-create-signal-effect',
+    type: 'hook',
+    title: 'createSignalEffect(fn)',
+    subtitle: 'Signals v2 reactive reaction runner that auto-subscribes to signals read inside it',
+    category: 'Core Reactivity',
+    badge: 'Signals v2',
+    badgeType: 'core',
+    icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+    hookSignature: 'const cleanup = createSignalEffect(() => { console.log(count.value); });',
+    hookSnippet: `import { createSignalEffect } from 'ureact';
+
+const cleanup = createSignalEffect(() => {
+  console.log('Count updated:', count.value);
+});`,
+    _searchIndex: 'createsignaleffect effect reaction auto subscribe signals v2'
+  },
+  {
+    id: 'hook-use-signal',
+    type: 'hook',
+    title: 'useSignal(initialOrSignal)',
+    subtitle: 'Consume or create a Signals v2 reactive signal directly in React JSX components',
+    category: 'Core Reactivity',
+    badge: 'Signals v2',
+    badgeType: 'core',
+    icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+    hookSignature: 'const [val, setVal, signalInstance] = useSignal(initialValue | existingSignal);',
+    hookSnippet: `import { useSignal } from 'ureact';
+
+export function Counter() {
+  const [count, setCount] = useSignal(0);
+  return <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>;
+}`,
+    _searchIndex: 'usesignal signal scalar reactivity fine grained hook jsx'
+  },
+  {
+    id: 'hook-use-computed',
+    type: 'hook',
+    title: 'useComputed(getter, deps?)',
+    subtitle: 'Signals v2 React hook to subscribe component to a computed reactive value',
+    category: 'Core Reactivity',
+    badge: 'Signals v2',
+    badgeType: 'core',
+    icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+    hookSignature: 'const result = useComputed(() => count.value * multiplier.value);',
+    hookSnippet: `import { useComputed } from 'ureact';
+
+const total = useComputed(() => items.value.reduce((a, b) => a + b.price, 0));`,
+    _searchIndex: 'usecomputed computed memoized reactive signal hook'
   },
   {
     id: 'hook-use-query',
@@ -424,7 +496,10 @@ export function ShortcutMenuModal({
   canUndo,
   canRedo,
   theme = 'light',
-  onToggleTheme
+  onToggleTheme,
+  currentVersion = '2.2.0-next',
+  onSelectVersion,
+  onOpenRoadmap
 }: ShortcutMenuModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeScope, setActiveScope] = useState<'all' | 'docs' | 'hooks' | 'actions'>('all');
@@ -580,8 +655,83 @@ export function ShortcutMenuModal({
         window.open('https://github.com/facebook/react', '_blank');
       },
       _searchIndex: 'github repo source react 19 external link'
+    },
+    {
+      id: 'action-open-playground',
+      type: 'action' as PaletteItemType,
+      title: 'Open Interactive Live Playground',
+      subtitle: 'In-browser editable code sandbox with live state inspection',
+      category: 'Developer Tools',
+      badge: 'Playground',
+      badgeType: 'action' as const,
+      icon: <Code2 size={16} style={{ color: 'var(--accent-cyan)' }} />,
+      action: () => {
+        onSelectPage('playground');
+        onClose();
+      },
+      _searchIndex: 'playground live sandbox run interactive code editor'
+    },
+    {
+      id: 'action-open-roadmap',
+      type: 'action' as PaletteItemType,
+      title: "What's New in v2.2.0 Roadmap & Releases",
+      subtitle: 'Signals v2, Live Sandbox, React 19 ActionForm, and v3.0 RFCs',
+      category: 'Releases & Versions',
+      badge: 'Roadmap',
+      badgeType: 'action' as const,
+      icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+      action: () => {
+        onOpenRoadmap?.();
+        onClose();
+      },
+      _searchIndex: 'roadmap changelog releases next version v2.2 v3.0 rfcs'
+    },
+    {
+      id: 'action-switch-next',
+      type: 'action' as PaletteItemType,
+      title: 'Switch Channel: v2.2.0-next (Canary)',
+      subtitle: 'Active: Signals v2, Live Sandbox, React 19 Actions',
+      category: 'Releases & Versions',
+      badge: 'Canary',
+      badgeType: 'action' as const,
+      icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
+      action: () => {
+        onSelectVersion?.('2.2.0-next');
+        showToast('Switched documentation channel to v2.2.0-next');
+      },
+      _searchIndex: 'version channel switch v2.2 next canary'
+    },
+    {
+      id: 'action-switch-stable',
+      type: 'action' as PaletteItemType,
+      title: 'Switch Channel: v2.1.0 (Stable)',
+      subtitle: 'Active: Concurrent proxy store, $bind, SWR cache',
+      category: 'Releases & Versions',
+      badge: 'Stable',
+      badgeType: 'action' as const,
+      icon: <Package size={16} style={{ color: '#22c55e' }} />,
+      action: () => {
+        onSelectVersion?.('2.1.0');
+        showToast('Switched documentation channel to v2.1.0');
+      },
+      _searchIndex: 'version channel switch v2.1 stable production'
+    },
+    {
+      id: 'action-copy-install',
+      type: 'action' as PaletteItemType,
+      title: 'Copy Install Command: npm i ureact@next',
+      subtitle: 'Quickly install the latest v2.2.0 Canary build with Signals v2',
+      category: 'Developer Tools',
+      badge: 'NPM',
+      badgeType: 'action' as const,
+      icon: <Terminal size={16} style={{ color: 'var(--accent-cyan)' }} />,
+      action: () => {
+        navigator.clipboard.writeText('npm i ureact@next');
+        showToast('Copied: npm i ureact@next');
+      },
+      _searchIndex: 'npm install command ureact@next terminal copy'
     }
-  ], [theme, canUndo, canRedo, onToggleTheme, onUndo, onRedo]);
+  ], [theme, canUndo, canRedo, onToggleTheme, onUndo, onRedo, onSelectPage, onClose, onOpenRoadmap, onSelectVersion]);
 
   // Transform Docs into PaletteItems
   const docItems: PaletteItem[] = useMemo(() => {
@@ -640,10 +790,48 @@ export function ShortcutMenuModal({
     if (activeScope === 'hooks') list = list.filter((i) => i.type === 'hook');
     if (activeScope === 'actions') list = list.filter((i) => i.type === 'action');
 
-    const clean = deferredSearch.replace(/^(@hooks|@hook|@docs|@doc|>|@cmd)\s*/i, '').trim().toLowerCase();
+    const rawClean = deferredSearch.replace(/^(@hooks|@hook|@docs|@doc|>|@cmd)\s*/i, '').trim();
+    const clean = rawClean.toLowerCase();
+
+    // Command Palette v3.0: Instant Live Expression Evaluator (e.g. "= 2 + 2", "128 * 4", "calc 100/5")
+    let evalItem: PaletteItem | null = null;
+    if (
+      rawClean.startsWith('=') ||
+      rawClean.startsWith('calc ') ||
+      (/^[\d\.\s\+\-\*\/\%\(\)]+$/.test(rawClean) && /[\+\-\*\/]/.test(rawClean))
+    ) {
+      try {
+        const expr = rawClean.replace(/^(=|calc\s*)/i, '').trim();
+        if (/^[\d\.\s\+\-\*\/\%\(\)]+$/.test(expr)) {
+          // eslint-disable-next-line no-new-func
+          const result = Function(`"use strict"; return (${expr})`)();
+          if (typeof result === 'number' && !isNaN(result)) {
+            evalItem = {
+              id: 'action-live-calc',
+              type: 'action',
+              title: `${expr} = ${result}`,
+              subtitle: 'Computed live in-browser. Press Enter to copy value to clipboard.',
+              category: 'Live Evaluator',
+              badge: 'Calculator',
+              badgeType: 'action',
+              icon: <Cpu size={16} style={{ color: 'var(--accent-cyan)' }} />,
+              action: () => {
+                navigator.clipboard.writeText(String(result));
+                showToast(`Copied result: ${result}`);
+              },
+              _searchIndex: `${clean} calc eval calculate math`
+            };
+          }
+        }
+      } catch {
+        // Ignore math eval errors
+      }
+    }
+
     if (!clean) return list;
 
-    return list.filter((item) => item._searchIndex.includes(clean));
+    const matched = list.filter((item) => item._searchIndex.includes(clean));
+    return evalItem ? [evalItem, ...matched] : matched;
   }, [allPaletteItems, activeScope, deferredSearch]);
 
   // Ensure selectedIndex stays valid when list changes
@@ -1120,7 +1308,7 @@ export function ShortcutMenuModal({
           </div>
 
           <div>
-            Powered by <strong style={{ color: 'var(--text-main)' }}>uReact v2.1 Engine</strong>
+            Powered by <strong style={{ color: 'var(--text-main)' }}>uReact v2.2.0-next Engine</strong>
           </div>
         </div>
 

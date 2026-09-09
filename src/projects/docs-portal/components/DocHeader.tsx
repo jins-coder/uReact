@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { UReactLogo } from './UReactLogo';
 import {
   Zap,
@@ -12,7 +12,11 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  ChevronDown,
+  Check,
+  Sparkles,
+  GitBranch
 } from 'lucide-react';
 
 export interface DocHeaderProps {
@@ -23,6 +27,9 @@ export interface DocHeaderProps {
   onToggleMobileMenu: () => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
+  currentVersion?: string;
+  onSelectVersion?: (version: string) => void;
+  onOpenRoadmap?: () => void;
 }
 
 export function DocHeader({
@@ -32,8 +39,30 @@ export function DocHeader({
   mobileMenuOpen,
   onToggleMobileMenu,
   theme = 'light',
-  onToggleTheme
+  onToggleTheme,
+  currentVersion = '2.2.0-next',
+  onSelectVersion,
+  onOpenRoadmap
 }: DocHeaderProps) {
+  const [versionMenuOpen, setVersionMenuOpen] = useState(false);
+  const versionMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (versionMenuRef.current && !versionMenuRef.current.contains(e.target as Node)) {
+        setVersionMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const versions = [
+    { id: '2.2.0-next', label: 'v2.2.0-next', tag: 'Next / Canary', desc: 'Signals v2, Live Sandbox, Actions' },
+    { id: '2.1.0', label: 'v2.1.0', tag: 'Latest / Stable', desc: 'Concurrent proxy store, $bind, SWR' },
+    { id: '2.0.0', label: 'v2.0.0', tag: 'LTS', desc: 'Original reactive core' }
+  ];
+
   return (
     <header
       className="doc-header"
@@ -88,17 +117,140 @@ export function DocHeader({
           </div>
         </div>
 
-        <div
-          style={{
-            fontSize: '0.75rem',
-            color: 'var(--text-dim)',
-            fontFamily: 'var(--font-mono)',
-            paddingLeft: '12px',
-            borderLeft: '1px solid var(--border-subtle)'
-          }}
-          className="header-version"
-        >
-          v2.1.0
+        {/* Version Switcher Dropdown (react.dev style) */}
+        <div ref={versionMenuRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setVersionMenuOpen(!versionMenuOpen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.78rem',
+              color: 'var(--text-dim)',
+              fontFamily: 'var(--font-mono)',
+              padding: '3px 8px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-subtle)',
+              background: versionMenuOpen ? 'var(--bg-card)' : 'transparent',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+            title="Switch Documentation Version"
+          >
+            <span style={{ color: currentVersion.includes('next') ? 'var(--accent-cyan)' : 'var(--text-main)', fontWeight: 700 }}>
+              v{currentVersion}
+            </span>
+            <ChevronDown size={12} style={{ opacity: 0.7, transform: versionMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
+          </button>
+
+          {versionMenuOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 6px)',
+                left: 0,
+                width: '260px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '12px',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+                padding: '8px',
+                zIndex: 1000,
+                animation: 'paletteFadeIn 0.12s ease-out'
+              }}
+            >
+              <div style={{ padding: '6px 8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Versions
+              </div>
+
+              {versions.map((ver) => {
+                const isSelected = currentVersion === ver.id;
+                return (
+                  <button
+                    key={ver.id}
+                    onClick={() => {
+                      onSelectVersion?.(ver.id);
+                      setVersionMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: isSelected ? 'var(--accent-cyan-bg)' : 'transparent',
+                      color: isSelected ? 'var(--accent-cyan)' : 'var(--text-main)',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      marginBottom: '2px',
+                      transition: 'background 0.12s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = 'var(--bg-secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.82rem', fontFamily: 'var(--font-mono)' }}>
+                          {ver.label}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '0.65rem',
+                            padding: '1px 5px',
+                            borderRadius: '4px',
+                            background: ver.id.includes('next') ? 'var(--accent-cyan-bg)' : 'var(--bg-secondary)',
+                            color: ver.id.includes('next') ? 'var(--accent-cyan)' : 'var(--text-dim)',
+                            border: '1px solid var(--border-subtle)'
+                          }}
+                        >
+                          {ver.tag}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: '2px' }}>
+                        {ver.desc}
+                      </div>
+                    </div>
+                    {isSelected && <Check size={14} color="var(--accent-cyan)" />}
+                  </button>
+                );
+              })}
+
+              <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '6px 0' }} />
+
+              <button
+                onClick={() => {
+                  setVersionMenuOpen(false);
+                  onOpenRoadmap?.();
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--accent-cyan)',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background 0.12s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--accent-cyan-bg)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Sparkles size={14} />
+                <span>What's New in v2.2.0 Roadmap</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
