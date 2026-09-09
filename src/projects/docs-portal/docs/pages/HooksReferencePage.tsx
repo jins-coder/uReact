@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { CodeBlock } from '../../components/CodeBlock';
 import { Callout } from '../../components/Callout';
+import { HookUsageModal, HookUsageModalData } from '../../components/HookUsageModal';
 import {
   Layers,
   Sparkles,
@@ -11,8 +12,11 @@ import {
   Zap,
   Filter,
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Maximize2,
+  ExternalLink
 } from 'lucide-react';
+
 
 export interface HookParameter {
   name: string;
@@ -743,14 +747,53 @@ export function TagManager() {
   }
 ];
 
-const OFFICIAL_REACT_HOOKS = [
+const OFFICIAL_REACT_HOOKS: (HookUsageModalData & { version: string; purpose: string; ureactEquivalent: string; whyBetter: string })[] = [
   {
     name: 'useState',
     version: 'React 16.8+',
     purpose: 'Local component state management.',
     signature: 'const [state, setState] = useState(initialState)',
     ureactEquivalent: 'createStore / useLocalStore / signal',
-    whyBetter: 'Direct proxy mutations (user.name = "Alex"), 0 setter boilerplate, automated input 2-way binding with store.$bind.'
+    whyBetter: 'Direct proxy mutations (user.name = "Alex"), 0 setter boilerplate, automated input 2-way binding with store.$bind.',
+    example: `import { createStore, signal, useStore } from 'ureact';
+
+// Option A: Deep Proxy Store with zero-boilerplate $bind
+const user = createStore({ name: 'Alex', age: 28, isPro: true });
+
+export function UserProfile() {
+  return (
+    <div>
+      <input {...user.$bind.name} placeholder="Name" />
+      <button onClick={() => user.state.age++}>Age: {user.state.age}</button>
+      <button onClick={() => user.$toggle('isPro')}>
+        Status: {user.state.isPro ? 'PRO' : 'FREE'}
+      </button>
+    </div>
+  );
+}
+
+// Option B: Fine-grained atomic signal (0 parent re-renders)
+export function QuickCounter() {
+  const count = signal(0);
+  return <button onClick={() => count.value++}>Count: {count.value}</button>;
+}`,
+    standardReactExample: `import { useState } from 'react';
+
+export function LegacyUser() {
+  const [name, setName] = useState('Alex');
+  const [age, setAge] = useState(28);
+  const [isPro, setIsPro] = useState(true);
+
+  return (
+    <div>
+      <input value={name} onChange={e => setName(e.target.value)} />
+      <button onClick={() => setAge(a => a + 1)}>Age: {age}</button>
+      <button onClick={() => setIsPro(p => !p)}>
+        Status: {isPro ? 'PRO' : 'FREE'}
+      </button>
+    </div>
+  );
+}`
   },
   {
     name: 'useReducer',
@@ -758,7 +801,48 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Complex state updates with action dispatches & reducers.',
     signature: 'const [state, dispatch] = useReducer(reducer, initialArg, init)',
     ureactEquivalent: 'createStore with direct methods',
-    whyBetter: 'Eliminates switch/case action ceremony. Call store.increment() or state mutations directly.'
+    whyBetter: 'Eliminates switch/case action ceremony. Call store.increment() or state mutations directly.',
+    example: `import { createStore, useStore } from 'ureact';
+
+// Methods are colocated directly on the store. No switch/case action ceremony!
+export const cartStore = createStore({
+  items: [] as { id: string; title: string; price: number }[],
+  addItem(title: string, price: number) {
+    this.items.push({ id: Math.random().toString(), title, price });
+  },
+  removeItem(id: string) {
+    this.items = this.items.filter(item => item.id !== id);
+  },
+  get total() {
+    return this.items.reduce((sum, i) => sum + i.price, 0);
+  }
+});
+
+export function Cart() {
+  const cart = useStore(cartStore);
+  return (
+    <div>
+      <h3>Total: \${cart.total}</h3>
+      <button onClick={() => cartStore.addItem('Course', 49)}>Add Item</button>
+    </div>
+  );
+}`,
+    standardReactExample: `import { useReducer } from 'react';
+
+type Action = { type: 'ADD'; title: string } | { type: 'REMOVE'; id: string };
+
+function reducer(state: string[], action: Action) {
+  switch (action.type) {
+    case 'ADD': return [...state, action.title];
+    case 'REMOVE': return state.filter(i => i !== action.id);
+    default: return state;
+  }
+}
+
+export function LegacyCart() {
+  const [items, dispatch] = useReducer(reducer, []);
+  return <button onClick={() => dispatch({ type: 'ADD', title: 'Course' })}>Add</button>;
+}`
   },
   {
     name: 'useRef',
@@ -766,7 +850,35 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Mutable container that persists without triggering re-renders; DOM element references.',
     signature: 'const ref = useRef(initialValue)',
     ureactEquivalent: 'Native useRef + signal (for reactive refs)',
-    whyBetter: 'Fully compatible. Pair with signals for fine-grained scalar tracking without re-renders.'
+    whyBetter: 'Fully compatible. Pair with signals for fine-grained scalar tracking without re-renders.',
+    example: `import { useRef } from 'react';
+import { signal } from 'ureact';
+
+export function InputWithReactiveRef() {
+  // 1. Standard DOM element ref (100% compatible with React)
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 2. Reactive scalar reference without component re-render
+  const scrollY = signal(0);
+
+  return (
+    <div>
+      <input ref={inputRef} placeholder="Focus target" />
+      <button onClick={() => inputRef.current?.focus()}>Focus Input</button>
+      <div>Scroll offset: {scrollY.value}px</div>
+    </div>
+  );
+}`,
+    standardReactExample: `import { useRef } from 'react';
+
+export function LegacyRef() {
+  const countRef = useRef(0);
+  function handleClick() {
+    countRef.current++;
+    console.log(countRef.current);
+  }
+  return <button onClick={handleClick}>Increment Ref</button>;
+}`
   },
   {
     name: 'useImperativeHandle',
@@ -774,15 +886,78 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Customizes the ref handle exposed by forwardRef to parent components.',
     signature: 'useImperativeHandle(ref, createHandle, [deps])',
     ureactEquivalent: 'Native useImperativeHandle',
-    whyBetter: 'Fully compatible. In React 19, forwardRef is optional (ref is a direct prop).'
+    whyBetter: 'Fully compatible. In React 19, forwardRef is optional (ref is a direct prop).',
+    example: `import { useImperativeHandle, useRef } from 'react';
+
+// In React 19 + uReact, ref is a direct prop (no forwardRef wrapper required)
+export function FancyInput({ ref }: { ref: any }) {
+  const nativeInputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusAndSelect() {
+      nativeInputRef.current?.focus();
+      nativeInputRef.current?.select();
+    },
+    resetValue() {
+      if (nativeInputRef.current) nativeInputRef.current.value = '';
+    }
+  }));
+
+  return <input ref={nativeInputRef} className="fancy-input" />;
+}`,
+    standardReactExample: `import { forwardRef, useImperativeHandle, useRef } from 'react';
+
+export const LegacyFancyInput = forwardRef((props, ref) => {
+  const inputRef = useRef(null);
+  useImperativeHandle(ref, () => ({
+    focus() { inputRef.current.focus(); }
+  }));
+  return <input ref={inputRef} />;
+});`
   },
   {
     name: 'useEffect',
     version: 'React 16.8+',
     purpose: 'Side-effects after render (DOM mutations, data fetching, subscriptions).',
     signature: 'useEffect(() => { ... return cleanup }, [deps])',
-    ureactEquivalent: 'useMount / useUnmount / useWatch',
-    whyBetter: 'Separates lifecycles into explicit hooks. Zero empty [] array traps or stale closure bugs.'
+    ureactEquivalent: 'useMount / useUnmount / useWatchReactive',
+    whyBetter: 'Separates lifecycles into explicit hooks. Zero empty [] array traps or stale closure bugs.',
+    example: `import { useMount, useUnmount, useWatchReactive, signal } from 'ureact';
+
+export function SmartWidget() {
+  const status = signal('idle');
+
+  // 1. Explicit Mount: Runs once on component mount without [] linter warnings
+  useMount(() => {
+    console.log('Component mounted cleanly');
+  });
+
+  // 2. Explicit Unmount: Zero cleanup ceremony
+  useUnmount(() => {
+    console.log('Component safely unmounted');
+  });
+
+  // 3. Reactive State Watcher: Get exact (newVal, oldVal)
+  useWatchReactive(status, (next, prev) => {
+    console.log(\`Status transition: \${prev} ➔ \${next}\`);
+  });
+
+  return <button onClick={() => status.value = 'active'}>Activate</button>;
+}`,
+    standardReactExample: `import { useEffect, useState } from 'react';
+
+export function LegacyEffect() {
+  const [status, setStatus] = useState('idle');
+
+  useEffect(() => {
+    console.log('Mounted');
+    return () => console.log('Unmounted');
+  }, []); // Warning: Missing dependency if status is referenced
+
+  useEffect(() => {
+    console.log('Status changed to', status);
+  }, [status]); // Runs on initial mount even if unwanted
+}`
   },
   {
     name: 'useLayoutEffect',
@@ -790,15 +965,65 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Synchronous execution after DOM mutations before browser paints (measurements/layout shifts).',
     signature: 'useLayoutEffect(() => { ... }, [deps])',
     ureactEquivalent: 'Native useLayoutEffect + useWatch({ flush: "sync" })',
-    whyBetter: 'Prevents visual layout flashes and layout thrashing.'
+    whyBetter: 'Prevents visual layout flashes and layout thrashing.',
+    example: `import { useLayoutEffect, useRef } from 'react';
+
+export function Tooltip({ text }: { text: string }) {
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Synchronous pre-paint execution to prevent layout shift or flicker:
+  useLayoutEffect(() => {
+    if (tooltipRef.current) {
+      const { height } = tooltipRef.current.getBoundingClientRect();
+      tooltipRef.current.style.transform = \`translateY(-\${height + 8}px)\`;
+    }
+  }, [text]);
+
+  return <div ref={tooltipRef} className="tooltip">{text}</div>;
+}`,
+    standardReactExample: `import { useLayoutEffect, useRef } from 'react';
+
+export function LegacyLayout() {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    // Blocks browser painting until measurements finish
+  }, []);
+  return <div ref={ref}>Box</div>;
+}`
   },
   {
     name: 'useInsertionEffect',
     version: 'React 18+',
     purpose: 'Synchronous execution before DOM mutations for CSS-in-JS library rule injections.',
     signature: 'useInsertionEffect(() => { ... }, [deps])',
-    ureactEquivalent: 'Native useInsertionEffect',
-    whyBetter: 'Specialized for CSS-in-JS style sheet tag insertion.'
+    ureactEquivalent: '<Scoped> & useScopedCSS',
+    whyBetter: 'Specialized for CSS-in-JS style sheet tag insertion. uReact provides native <Scoped> component.',
+    example: `import { Scoped, useScopedCSS } from 'ureact';
+
+// Instead of low-level useInsertionEffect DOM stylesheet injection,
+// uReact provides native <Scoped> and useScopedCSS with auto-cleanup:
+export function ScopedCard() {
+  return (
+    <Scoped css={\`
+      .card { background: #0ea5e9; padding: 16px; border-radius: 8px; }
+      .title { color: white; font-weight: bold; }
+    \`}>
+      <div className="card">
+        <h4 className="title">Zero-Bleed Scoped Component</h4>
+      </div>
+    </Scoped>
+  );
+}`,
+    standardReactExample: `import { useInsertionEffect } from 'react';
+
+export function LegacyStyleInjector() {
+  useInsertionEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = '.custom { color: red; }';
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, []);
+}`
   },
   {
     name: 'useMemo',
@@ -806,15 +1031,72 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Caches the calculated result of expensive computations between re-renders.',
     signature: 'const cachedValue = useMemo(calculateValue, [deps])',
     ureactEquivalent: 'computed(fn) / view() auto-memoization',
-    whyBetter: 'uReact proxy stores compute derived state on-demand without manual dependency arrays.'
+    whyBetter: 'uReact proxy stores compute derived state on-demand without manual dependency arrays.',
+    example: `import { signal, computed, useComputed } from 'ureact';
+
+const items = signal([10, 20, 30, 40]);
+const taxRate = signal(0.18);
+
+// Automatically tracks accessed signals.
+// Lazily evaluated & cached without manual dependency array!
+const cartTotal = computed(() => {
+  const subtotal = items.value.reduce((a, b) => a + b, 0);
+  return subtotal * (1 + taxRate.value);
+});
+
+export function CartSummary() {
+  const total = useComputed(() => cartTotal.value);
+  return <div>Total with Tax: \${total}</div>;
+}`,
+    standardReactExample: `import { useMemo, useState } from 'react';
+
+export function LegacyMemo() {
+  const [items] = useState([10, 20, 30, 40]);
+  const [taxRate] = useState(0.18);
+
+  // Manual dependency array required:
+  const cartTotal = useMemo(() => {
+    const subtotal = items.reduce((a, b) => a + b, 0);
+    return subtotal * (1 + taxRate);
+  }, [items, taxRate]);
+
+  return <div>Total: \${cartTotal}</div>;
+}`
   },
   {
     name: 'useCallback',
     version: 'React 16.8+',
     purpose: 'Caches a function definition between re-renders to prevent child component re-renders.',
     signature: 'const cachedFn = useCallback(fn, [deps])',
-    ureactEquivalent: 'store actions / event modifiers (prevent, stop)',
-    whyBetter: 'Store action methods are permanently stable references that never recreate.'
+    ureactEquivalent: 'store actions / event modifiers',
+    whyBetter: 'Store action methods are permanently stable references that never recreate.',
+    example: `import { createStore } from 'ureact';
+
+// Store methods are inherently stable reference pointers.
+// You never need useCallback to memoize callbacks for children!
+export const userActions = createStore({
+  activeTab: 'profile',
+  switchTab(tab: string) {
+    this.activeTab = tab;
+  }
+});
+
+export function HeaderNav() {
+  // userActions.switchTab is permanently stable across all renders
+  return <button onClick={() => userActions.switchTab('settings')}>Switch</button>;
+}`,
+    standardReactExample: `import { useCallback, useState } from 'react';
+
+export function LegacyCallback() {
+  const [activeTab, setActiveTab] = useState('profile');
+
+  // Must wrap in useCallback to prevent child re-renders:
+  const switchTab = useCallback((tab) => {
+    setActiveTab(tab);
+  }, []);
+
+  return <button onClick={() => switchTab('settings')}>Switch</button>;
+}`
   },
   {
     name: 'useContext',
@@ -822,7 +1104,36 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Reads and subscribes to a React context value.',
     signature: 'const value = useContext(MyContext)',
     ureactEquivalent: 'use(MyContext) / global createStore',
-    whyBetter: 'Global createStore() replaces context boilerplate without Provider wrapper nesting.'
+    whyBetter: 'Global createStore() replaces context boilerplate without Provider wrapper nesting.',
+    example: `import { createStore, useStore } from 'ureact';
+
+// 1. Create store outside components (no <Provider> nesting required)
+export const themeStore = createStore({
+  mode: 'dark',
+  toggle() { this.mode = this.mode === 'dark' ? 'light' : 'dark'; }
+});
+
+// 2. Consume directly in any component
+export function ThemeToggle() {
+  const theme = useStore(themeStore);
+  return (
+    <button onClick={() => themeStore.toggle()}>
+      Current: {theme.mode}
+    </button>
+  );
+}`,
+    standardReactExample: `import { createContext, useContext, useState } from 'react';
+
+const ThemeCtx = createContext(null);
+
+export function App() {
+  const [mode, setMode] = useState('dark');
+  return (
+    <ThemeCtx.Provider value={{ mode, setMode }}>
+      <div>Theme Provider Nesting</div>
+    </ThemeCtx.Provider>
+  );
+}`
   },
   {
     name: 'use(Resource)',
@@ -830,7 +1141,34 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Unwraps promises or reads context conditionally inside loops and if-branches.',
     signature: 'const data = use(Promise | Context)',
     ureactEquivalent: 'usePromise / useResource / <Await for={...}>',
-    whyBetter: 'Works inside conditionals; paired with <Await> for declarative promise resolution in JSX.'
+    whyBetter: 'Works inside conditionals; paired with <Await> for declarative promise resolution in JSX.',
+    example: `import { usePromise, Await } from 'ureact';
+
+export function UserDetails({ promise }: { promise: Promise<{ name: string }> }) {
+  // Option A: Direct promise unwrapping
+  const user = usePromise(promise);
+
+  // Option B: Declarative JSX <Await>
+  return (
+    <Await for={promise} fallback={<div>Loading user profile...</div>}>
+      {(userData) => <h3>Welcome, {userData.name}!</h3>}
+    </Await>
+  );
+}`,
+    standardReactExample: `import { use, Suspense } from 'react';
+
+function UserContent({ promise }) {
+  const user = use(promise);
+  return <h3>{user.name}</h3>;
+}
+
+export function LegacyAwait({ promise }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserContent promise={promise} />
+    </Suspense>
+  );
+}`
   },
   {
     name: 'useActionState',
@@ -838,7 +1176,43 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Handles async form actions with automatic pending status, errors, and returned state.',
     signature: 'const [state, formAction, isPending] = useActionState(fn, initial)',
     ureactEquivalent: 'useAction(fn, initial) / <ActionForm>',
-    whyBetter: 'uReact adds typed payloads, auto error capture, reset helpers, and optimistic rollback.'
+    whyBetter: 'uReact adds typed payloads, auto error capture, reset helpers, and optimistic rollback.',
+    example: `import { useAction } from 'ureact';
+
+export function SubscribeForm() {
+  const action = useAction(
+    async (prev, email: string) => {
+      return await api.subscribe(email);
+    },
+    { status: 'idle' }
+  );
+
+  return (
+    <form action={(fd) => action.run(fd.get('email') as string)}>
+      <input name="email" type="email" placeholder="Email" required />
+      <button disabled={action.isPending}>
+        {action.isPending ? 'Sending...' : 'Join Newsletter'}
+      </button>
+      {action.error && <p className="error">{action.error.message}</p>}
+    </form>
+  );
+}`,
+    standardReactExample: `import { useActionState } from 'react';
+
+async function subscribeAction(prevState, formData) {
+  const email = formData.get('email');
+  return await api.subscribe(email);
+}
+
+export function LegacyAction() {
+  const [state, formAction, isPending] = useActionState(subscribeAction, null);
+  return (
+    <form action={formAction}>
+      <input name="email" />
+      <button disabled={isPending}>Submit</button>
+    </form>
+  );
+}`
   },
   {
     name: 'useOptimistic',
@@ -846,7 +1220,37 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Displays immediate optimistic UI updates while background async actions execute.',
     signature: 'const [optimistic, setOptimistic] = useOptimistic(state, updateFn)',
     ureactEquivalent: 'useOptimisticAction / useMutation',
-    whyBetter: 'Automates rollback on server failure; integrates with reactive proxy stores.'
+    whyBetter: 'Automates rollback on server failure; integrates with reactive proxy stores.',
+    example: `import { useAction } from 'ureact';
+
+export function TodoList() {
+  // useAction merges useActionState + useOptimistic with typed rollback
+  const action = useAction<string, string[]>(
+    async (prev, newTodo) => await api.saveTodo(newTodo),
+    ['Buy milk'],
+    {
+      // Instant optimistic feedback in 0ms:
+      optimisticUpdate: (prev, newTodo) => [...prev, \`\${newTodo} (saving...)\`]
+    }
+  );
+
+  return (
+    <div>
+      <button onClick={() => action.run('Learn uReact')}>+ Add Todo</button>
+      <ul>{action.data.map((t, i) => <li key={i}>{t}</li>)}</ul>
+    </div>
+  );
+}`,
+    standardReactExample: `import { useOptimistic, useState, useTransition } from 'react';
+
+export function LegacyOptimistic() {
+  const [todos, setTodos] = useState(['Buy milk']);
+  const [isPending, startTransition] = useTransition();
+  const [optimistic, setOptimistic] = useOptimistic(
+    todos,
+    (state, newTodo) => [...state, \`\${newTodo} (saving...)\`]
+  );
+}`
   },
   {
     name: 'useFormStatus',
@@ -854,7 +1258,30 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Reads parent form pending status, form action URL, and submitted FormData.',
     signature: 'const { pending, data, method, action } = useFormStatus()',
     ureactEquivalent: 'useActionStatus / <ActionSubmitButton>',
-    whyBetter: 'Safe execution outside <form> boundaries without throwing unexpected runtime errors.'
+    whyBetter: 'Safe execution outside <form> boundaries without throwing unexpected runtime errors.',
+    example: `import { useActionStatus, ActionSubmitButton } from 'ureact';
+
+// Option A: Single-tag React 19 submit button with auto-pending
+export function CheckoutButton() {
+  return (
+    <ActionSubmitButton pendingText="Processing Order...">
+      Place Order
+    </ActionSubmitButton>
+  );
+}
+
+// Option B: Safe useActionStatus hook that never throws outside form
+export function CustomStatusIndicator() {
+  const { pending } = useActionStatus();
+  return <span>Status: {pending ? 'Active' : 'Idle'}</span>;
+}`,
+    standardReactExample: `import { useFormStatus } from 'react-dom';
+
+export function LegacyStatus() {
+  // Throws or fails if rendered outside <form>:
+  const { pending, data } = useFormStatus();
+  return <button disabled={pending}>Submit</button>;
+}`
   },
   {
     name: 'useTransition',
@@ -862,7 +1289,38 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Marks state updates as non-blocking transitions, preserving main thread responsiveness.',
     signature: 'const [isPending, startTransition] = useTransition()',
     ureactEquivalent: 'useActionTransition / batch(fn)',
-    whyBetter: 'React 19 async transition support with automatic error boundary capture.'
+    whyBetter: 'React 19 async transition support with automatic error boundary capture.',
+    example: `import { useActionTransition, batch } from 'ureact';
+
+export function TabSwitch() {
+  const [isPending, runTransition] = useActionTransition();
+
+  const handleSwitch = (tab: string) => {
+    runTransition(async () => {
+      // Async transition updates state non-blockingly:
+      store.activeTab = tab;
+      await fetchTabDetails(tab);
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={() => handleSwitch('analytics')}>
+        Analytics {isPending && '(loading...)'}
+      </button>
+    </div>
+  );
+}`,
+    standardReactExample: `import { useTransition } from 'react';
+
+export function LegacyTransition() {
+  const [isPending, startTransition] = useTransition();
+  function switchTab(tab) {
+    startTransition(() => {
+      setTab(tab);
+    });
+  }
+}`
   },
   {
     name: 'useDeferredValue',
@@ -870,7 +1328,25 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Defers updating a secondary part of the UI while user typing is active.',
     signature: 'const deferredValue = useDeferredValue(value, initialValue?)',
     ureactEquivalent: 'useDeferred / useDebounce',
-    whyBetter: 'React 19 initialValue fallback support + debounced scalar timing.'
+    whyBetter: 'React 19 initialValue fallback support + debounced scalar timing.',
+    example: `import { useState } from 'react';
+import { useDeferred, useDebounce } from 'ureact';
+
+export function SearchList() {
+  const [query, setQuery] = useState('');
+  
+  // React 19 initialValue fallback support + debouncing:
+  const deferredQuery = useDeferred(query, 'initial query');
+  const debouncedQuery = useDebounce(query, 250);
+
+  return <input value={query} onChange={e => setQuery(e.target.value)} />;
+}`,
+    standardReactExample: `import { useDeferredValue, useState } from 'react';
+
+export function LegacyDeferred() {
+  const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+}`
   },
   {
     name: 'useSyncExternalStore',
@@ -878,7 +1354,26 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Subscribes to external state stores with tearing-free concurrent rendering guarantees.',
     signature: 'useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)',
     ureactEquivalent: 'Core engine of uReact createStore()',
-    whyBetter: 'uReact wraps this internally so developers never have to write low-level snapshot getters.'
+    whyBetter: 'uReact wraps this internally so developers never have to write low-level snapshot getters.',
+    example: `import { createStore, useStore } from 'ureact';
+
+// uReact encapsulates useSyncExternalStore internally with zero tearing.
+// Developers write clean, intuitive state logic:
+export const counter = createStore({ count: 0 });
+
+export function Counter() {
+  const state = useStore(counter);
+  return <button onClick={() => counter.state.count++}>{state.count}</button>;
+}`,
+    standardReactExample: `import { useSyncExternalStore } from 'react';
+
+function subscribe(callback) { return () => {}; }
+function getSnapshot() { return window.innerWidth; }
+
+export function LegacySyncStore() {
+  const width = useSyncExternalStore(subscribe, getSnapshot);
+  return <div>Width: {width}</div>;
+}`
   },
   {
     name: 'useId',
@@ -886,25 +1381,72 @@ const OFFICIAL_REACT_HOOKS = [
     purpose: 'Generates unique IDs accessible for ARIA accessibility attributes and form associations.',
     signature: 'const id = useId()',
     ureactEquivalent: 'Native useId / auto-generated in <AutoForm>',
-    whyBetter: 'Built directly into uReact <AutoForm> inputs for zero-configuration WCAG compliance.'
+    whyBetter: 'Built directly into uReact <AutoForm> inputs for zero-configuration WCAG compliance.',
+    example: `import { AutoForm } from 'ureact';
+
+// <AutoForm> automatically generates compliant, unique ARIA IDs for all fields:
+export function ContactForm() {
+  return (
+    <AutoForm
+      initialValues={{ name: '', email: '' }}
+      onSubmit={(values) => api.submit(values)}
+    />
+  );
+}`,
+    standardReactExample: `import { useId } from 'react';
+
+export function LegacyIdForm() {
+  const nameId = useId();
+  const emailId = useId();
+  return (
+    <div>
+      <label htmlFor={nameId}>Name:</label>
+      <input id={nameId} />
+    </div>
+  );
+}`
   },
   {
     name: 'useDebugValue',
     version: 'React 16.8+',
     purpose: 'Displays a custom label for custom hooks in React DevTools.',
     signature: 'useDebugValue(value, formatFn?)',
-    ureactEquivalent: 'Native useDebugValue',
-    whyBetter: 'Integrated into uReact core hooks for clear inspection in React DevTools.'
+    ureactEquivalent: 'Native useDebugValue + uReact DevTools HUD',
+    whyBetter: 'Integrated into uReact core hooks and Quantum DevTools HUD with live time-travel inspection.',
+    example: `import { DevTools, registerDevTools, createStore } from 'ureact';
+
+// Instead of basic textual debug values, uReact provides a complete
+// in-browser Quantum DevTools HUD with live time-travel and 60 FPS telemetry:
+const cartStore = createStore({ items: [] });
+registerDevTools('CartStore', 'store', cartStore);
+
+export function App() {
+  return (
+    <div>
+      <MainContent />
+      <DevTools /> {/* Press Ctrl+Shift+D */}
+    </div>
+  );
+}`,
+    standardReactExample: `import { useDebugValue, useState } from 'react';
+
+export function useCustomHook() {
+  const [isOnline] = useState(true);
+  useDebugValue(isOnline ? 'Online' : 'Offline');
+}`
   }
 ];
+
 
 // Reusable Hook Element with Tabs: [Example] and [API & Signature]
 function HookTabCard({
   hook,
-  globalTab
+  globalTab,
+  onOpenModal
 }: {
   hook: DetailedHookItem;
   globalTab?: 'example' | 'api';
+  onOpenModal?: (data: HookUsageModalData) => void;
 }) {
   const [activeTab, setActiveTab] = useState<'example' | 'api'>('example');
 
@@ -968,8 +1510,33 @@ function HookTabCard({
           >
             <FileText size={14} /> API &amp; Signature
           </button>
+          {onOpenModal && (
+            <button
+              className="hook-tab-btn"
+              onClick={() => onOpenModal({
+                name: hook.shortName,
+                purpose: hook.description,
+                signature: hook.signature,
+                whyBetter: hook.whyBetter,
+                example: hook.example,
+                returns: hook.returns,
+                parameters: hook.parameters
+              })}
+              title="Pop out usage example in interactive modal"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: 'var(--accent-cyan, #38bdf8)'
+              }}
+            >
+              <Maximize2 size={13} />
+              <span>Popup</span>
+            </button>
+          )}
         </div>
       </div>
+
 
       <div className="hook-tab-body">
         {activeTab === 'example' ? (
@@ -1088,6 +1655,7 @@ export function HooksReferencePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [globalTab, setGlobalTab] = useState<'example' | 'api'>('example');
+  const [selectedModalHook, setSelectedModalHook] = useState<HookUsageModalData | null>(null);
 
   // Filter hooks by category and search term
   const filteredHooks = useMemo(() => {
@@ -1118,7 +1686,7 @@ export function HooksReferencePage() {
 
       <h1 className="doc-title">Complete Hooks &amp; "use" API Reference</h1>
       <p className="doc-lead">
-        Exhaustive reference of <strong>every official React hook and "use" function</strong> (from React 16.8 up to React 19) alongside the <strong>uReact</strong> developer-first equivalents. Each hook element includes an <strong>interactive Example tab</strong> with complete, copyable TypeScript code.
+        Exhaustive reference of <strong>every official React hook and "use" function</strong> (from React 16.8 up to React 19) alongside the <strong>uReact</strong> developer-first equivalents. Each hook element includes an <strong>interactive Example tab</strong> and a <strong>usage popup modal</strong> with complete, copyable TypeScript code.
       </p>
 
       {/* Global Interactive Hook Toolbar */}
@@ -1204,7 +1772,7 @@ export function HooksReferencePage() {
         1. Complete APIs Table (React 16.8 → React 19)
       </h2>
       <p>
-        The table below catalogs all 19 official React hooks, their version introduction, signature, and their corresponding uReact ergonomic replacement:
+        The table below catalogs all 19 official React hooks, their version introduction, signature, and their corresponding uReact ergonomic replacement. Click on any hook name or the <strong>View Example</strong> button to pop open the interactive usage code modal:
       </p>
 
       <div style={{ overflowX: 'auto', margin: '24px 0' }} className="table-container">
@@ -1216,6 +1784,7 @@ export function HooksReferencePage() {
               <th style={{ padding: '12px', color: 'var(--text-main)' }}>Purpose &amp; Signature</th>
               <th style={{ padding: '12px', color: 'var(--accent-emerald)' }}>uReact Equivalent</th>
               <th style={{ padding: '12px', color: 'var(--text-main)' }}>Developer Advantage</th>
+              <th style={{ padding: '12px', textAlign: 'center', color: 'var(--accent-cyan)' }}>Interactive Example</th>
             </tr>
           </thead>
           <tbody>
@@ -1227,7 +1796,19 @@ export function HooksReferencePage() {
                   background: i % 2 === 0 ? 'var(--bg-card-hover)' : 'transparent'
                 }}
               >
-                <td style={{ padding: '12px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent-cyan)' }}>
+                <td
+                  onClick={() => setSelectedModalHook(hook)}
+                  style={{
+                    padding: '12px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 700,
+                    color: 'var(--accent-cyan)',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px'
+                  }}
+                  title="Click to view interactive usage example modal"
+                >
                   {hook.name}()
                 </td>
                 <td style={{ padding: '12px', whiteSpace: 'nowrap', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
@@ -1237,11 +1818,44 @@ export function HooksReferencePage() {
                   <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px' }}>{hook.purpose}</div>
                   <code style={{ fontSize: '0.76rem', color: 'var(--accent-indigo)' }}>{hook.signature}</code>
                 </td>
-                <td style={{ padding: '12px', fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent-emerald)' }}>
+                <td
+                  onClick={() => setSelectedModalHook(hook)}
+                  style={{
+                    padding: '12px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 600,
+                    color: 'var(--accent-emerald)',
+                    cursor: 'pointer'
+                  }}
+                  title="Click to view equivalent example"
+                >
                   {hook.ureactEquivalent}
                 </td>
                 <td style={{ padding: '12px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                   {hook.whyBetter}
+                </td>
+                <td style={{ padding: '12px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                  <button
+                    onClick={() => setSelectedModalHook(hook)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      background: 'rgba(56, 189, 248, 0.1)',
+                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      color: 'var(--accent-cyan, #38bdf8)',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title={`View ${hook.name}() practical usage example`}
+                  >
+                    <Sparkles size={13} />
+                    <span>View Example</span>
+                  </button>
                 </td>
               </tr>
             ))}
@@ -1254,7 +1868,7 @@ export function HooksReferencePage() {
         2. React 19 Native Hooks Suite
       </h2>
       <p style={{ marginBottom: '20px' }}>
-        All React 19 primitives provided with first-class TypeScript helpers. Click the <strong>Example</strong> tab on any element below to inspect practical code:
+        All React 19 primitives provided with first-class TypeScript helpers. Click the <strong>Example</strong> tab or the <strong>Popup</strong> button on any element below to inspect practical code:
       </p>
 
       {react19Hooks.length === 0 ? (
@@ -1263,7 +1877,12 @@ export function HooksReferencePage() {
         </div>
       ) : (
         react19Hooks.map((hook) => (
-          <HookTabCard key={hook.id} hook={hook} globalTab={globalTab} />
+          <HookTabCard
+            key={hook.id}
+            hook={hook}
+            globalTab={globalTab}
+            onOpenModal={setSelectedModalHook}
+          />
         ))
       )}
 
@@ -1281,7 +1900,12 @@ export function HooksReferencePage() {
         </div>
       ) : (
         reactivityHooks.map((hook) => (
-          <HookTabCard key={hook.id} hook={hook} globalTab={globalTab} />
+          <HookTabCard
+            key={hook.id}
+            hook={hook}
+            globalTab={globalTab}
+            onOpenModal={setSelectedModalHook}
+          />
         ))
       )}
 
@@ -1299,9 +1923,22 @@ export function HooksReferencePage() {
         </div>
       ) : (
         utilityHooks.map((hook) => (
-          <HookTabCard key={hook.id} hook={hook} globalTab={globalTab} />
+          <HookTabCard
+            key={hook.id}
+            hook={hook}
+            globalTab={globalTab}
+            onOpenModal={setSelectedModalHook}
+          />
         ))
       )}
+
+      {/* Interactive Hook Usage Example Popup Modal */}
+      <HookUsageModal
+        isOpen={!!selectedModalHook}
+        onClose={() => setSelectedModalHook(null)}
+        data={selectedModalHook}
+      />
     </article>
   );
 }
+
