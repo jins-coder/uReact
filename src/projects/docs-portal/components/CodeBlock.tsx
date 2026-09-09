@@ -1,5 +1,5 @@
 import React from 'react';
-import { TorchCode } from './TorchCode';
+import { ReactDevCodeBlock } from './ReactDevCodeBlock';
 
 export interface CodeBlockProps {
   code: string;
@@ -7,20 +7,28 @@ export interface CodeBlockProps {
   title?: string;
   showLineNumbers?: boolean;
   highlightLines?: number[];
+  badge?: string;
+  badgeType?: 'bad' | 'good' | 'emerald' | 'neutral';
 }
 
 export function CodeBlock({
   code,
   language = 'tsx',
   title,
-  showLineNumbers = true,
-  highlightLines = []
+  showLineNumbers = false,
+  highlightLines = [],
+  badge,
+  badgeType = 'neutral'
 }: CodeBlockProps) {
   return (
-    <TorchCode
+    <ReactDevCodeBlock
       code={code}
-      title={title || language.toUpperCase()}
+      language={language}
+      title={title}
+      showLineNumbers={showLineNumbers}
       highlightLines={highlightLines}
+      badge={badge}
+      badgeType={badgeType}
     />
   );
 }
