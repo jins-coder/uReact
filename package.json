@@ -3,12 +3,25 @@
   "version": "2.0.0",
   "description": "A developer-first reactive framework built on top of React to eliminate hook boilerplate and simplify state, forms, and async flows.",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build:lib": "vite build --config vite.config.lib.ts && tsc -p tsconfig.lib.json",
+    "build:demo": "vite build",
+    "build": "npm run build:lib && npm run build:demo",
     "preview": "vite preview"
   },
   "keywords": [
