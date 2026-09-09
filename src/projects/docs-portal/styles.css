@@ -903,25 +903,18 @@ pre::-webkit-scrollbar-thumb:hover,
   filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.6));
 }
 
-.ureact-orbit {
-  transform-origin: 24px 24px;
+.ureact-rays {
+  transform-origin: 12px 12px;
+  animation: raysSpin 20s linear infinite;
 }
 
-.ureact-orbit-1 {
-  animation: orbitSway1 6s ease-in-out infinite alternate;
+.ureact-logo:hover .ureact-rays {
+  animation: raysSpin 6s linear infinite;
 }
 
-.ureact-orbit-2 {
-  animation: orbitSway2 6s ease-in-out infinite alternate;
+@keyframes raysSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-@keyframes orbitSway1 {
-  0% { transform: rotate(-30deg) scale(1); }
-  100% { transform: rotate(-24deg) scale(1.03); }
-}
-
-@keyframes orbitSway2 {
-  0% { transform: rotate(30deg) scale(1); }
-  100% { transform: rotate(36deg) scale(0.98); }
-}
 

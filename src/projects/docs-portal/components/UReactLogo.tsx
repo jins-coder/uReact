@@ -14,15 +14,14 @@ export function UReactLogo({
   animated = true
 }: UReactLogoProps) {
   const id = React.useId().replace(/:/g, '');
-  const gradId = `ureact-logo-grad-${id}`;
-  const accentId = `ureact-logo-accent-${id}`;
-  const glowId = `ureact-logo-glow-${id}`;
+  const gradId = `ureact-fav-grad-${id}`;
+  const glowId = `ureact-fav-glow-${id}`;
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`ureact-logo ${className}`}
@@ -35,95 +34,56 @@ export function UReactLogo({
       aria-label="uReact Logo"
     >
       <defs>
-        {/* Main Brand Gradient: React Cyan to Electric Indigo */}
-        <linearGradient id={gradId} x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#0284c7" />
-          <stop offset="45%" stopColor="#38bdf8" />
+        {/* Vibrant Cyan to Sky Reactive Gradient */}
+        <linearGradient id={gradId} x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="50%" stopColor="#0284c7" />
           <stop offset="100%" stopColor="#6366f1" />
         </linearGradient>
 
-        {/* Quantum Accent: Neon Cyan to Emerald Reactive */}
-        <linearGradient id={accentId} x1="16" y1="16" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="100%" stopColor="#10b981" />
-        </linearGradient>
-
-        {/* Soft Ambient Glow */}
+        {/* Ambient Glow */}
         <filter id={glowId} x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1.2" result="blur" />
+          <feGaussianBlur stdDeviation="0.8" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
       </defs>
 
-      {/* Atomic Orbital Ring 1: -30 deg */}
-      <ellipse
-        cx="24"
-        cy="24"
-        rx="20"
-        ry="7.8"
-        transform="rotate(-30 24 24)"
-        stroke={`url(#${gradId})`}
-        strokeWidth="2.2"
-        strokeOpacity="0.8"
-        className={animated ? 'ureact-orbit ureact-orbit-1' : ''}
-      />
-
-      {/* Atomic Orbital Ring 2: +30 deg */}
-      <ellipse
-        cx="24"
-        cy="24"
-        rx="20"
-        ry="7.8"
-        transform="rotate(30 24 24)"
-        stroke={`url(#${gradId})`}
-        strokeWidth="2.2"
-        strokeOpacity="0.8"
-        className={animated ? 'ureact-orbit ureact-orbit-2' : ''}
-      />
-
-      {/* Horizontal Ambient Electron Ring */}
-      <ellipse
-        cx="24"
-        cy="24"
-        rx="20"
-        ry="7.8"
-        transform="rotate(90 24 24)"
-        stroke={`url(#${gradId})`}
-        strokeWidth="1.5"
-        strokeOpacity="0.35"
-        strokeDasharray="2 3"
-      />
-
-      {/* The Iconic Geometric "u" Core */}
-      <path
-        d="M 16.5 15.5 V 25.5 C 16.5 29.6 19.8 33 24 33 C 28.2 33 31.5 29.6 31.5 25.5 V 15.5"
-        stroke={`url(#${gradId})`}
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      {/* Right Leg of the "u" */}
-      <path
-        d="M 31.5 23.5 V 33"
-        stroke={`url(#${gradId})`}
-        strokeWidth="3.2"
-        strokeLinecap="round"
-      />
-
-      {/* Central Reactive Nucleus Node */}
+      {/* Radiant Central Core */}
       <circle
-        cx="24"
-        cy="24"
-        r="2.8"
-        fill={`url(#${accentId})`}
+        cx="12"
+        cy="12"
+        r="4.2"
+        stroke={`url(#${gradId})`}
+        strokeWidth="2"
+        fill="rgba(56, 189, 248, 0.12)"
         filter={`url(#${glowId})`}
       />
 
-      {/* Orbiting Quantum Electron Beads */}
-      <circle cx="8.5" cy="15" r="2.2" fill="#38bdf8" />
-      <circle cx="39.5" cy="33" r="2.2" fill="#6366f1" />
-      <circle cx="39.5" cy="15" r="2.2" fill="#10b981" />
+      {/* Luminous Core Center Dot */}
+      <circle
+        cx="12"
+        cy="12"
+        r="1.6"
+        fill="#38bdf8"
+      />
+
+      {/* 8 Radiant Rays */}
+      <g
+        stroke={`url(#${gradId})`}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={animated ? 'ureact-rays' : ''}
+      >
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="m4.93 4.93 1.41 1.41" />
+        <path d="m17.66 17.66 1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="m6.34 17.66-1.41 1.41" />
+        <path d="m19.07 4.93-1.41 1.41" />
+      </g>
     </svg>
   );
 }
