@@ -289,18 +289,20 @@ export function ReactDevCodeBlock({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '10px 16px',
+          padding: '7px 12px',
           background: themeMode === 'light' ? '#f8fafc' : 'rgba(255, 255, 255, 0.03)',
           borderBottom: '1px solid var(--code-border, #e5e7eb)',
-          fontSize: '0.8rem'
+          fontSize: '0.75rem',
+          minWidth: 0,
+          gap: '8px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: '1 1 auto' }}>
           {/* react.dev Window Dots */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#ff5f56', display: 'inline-block' }} />
-            <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#ffbd2e', display: 'inline-block' }} />
-            <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#27c93f', display: 'inline-block' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f56', display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffbd2e', display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#27c93f', display: 'inline-block' }} />
           </div>
 
           <span
@@ -308,25 +310,34 @@ export function ReactDevCodeBlock({
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
               color: 'var(--text-main)',
-              fontSize: '0.8rem',
-              marginLeft: '4px'
+              fontSize: '0.74rem',
+              marginLeft: '2px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minWidth: 0
             }}
+            title={title || cleanLang.toUpperCase()}
           >
             {title || cleanLang.toUpperCase()}
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
           {badge && (
             <span
               style={{
-                fontSize: '0.72rem',
+                fontSize: '0.66rem',
                 fontWeight: 700,
-                padding: '2px 8px',
-                borderRadius: '6px',
+                padding: '1px 6px',
+                borderRadius: '4px',
                 background: badgeStyle.bg,
                 color: badgeStyle.color,
-                border: `1px solid ${badgeStyle.border}`
+                border: `1px solid ${badgeStyle.border}`,
+                whiteSpace: 'nowrap',
+                lineHeight: 1.3,
+                letterSpacing: '0.01em',
+                flexShrink: 0
               }}
             >
               {badge}
@@ -338,19 +349,21 @@ export function ReactDevCodeBlock({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '5px',
-              padding: '4px 9px',
-              borderRadius: '6px',
+              gap: '4px',
+              padding: '3px 8px',
+              borderRadius: '5px',
               background: 'var(--bg-card-hover)',
               border: '1px solid var(--border-subtle)',
               color: 'var(--text-muted)',
-              fontSize: '0.72rem',
+              fontSize: '0.68rem',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
               transition: 'all 0.15s ease'
             }}
             title="Copy code to clipboard"
           >
-            {copied ? <Check size={12} strokeWidth={2.5} /> : <Copy size={12} />}
+            {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} />}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
         </div>

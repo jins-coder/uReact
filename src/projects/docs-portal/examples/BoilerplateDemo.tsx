@@ -131,8 +131,8 @@ export const BoilerplateDemo = view(() => {
             How uReact systematically eliminates every repetitive code block in React development.
           </p>
         </div>
-        <div className="pill active" style={{ fontSize: '0.85rem', padding: '6px 14px' }}>
-          <TrendingDown size={15} /> <strong>-89.2% Code Reduction Achieved</strong>
+        <div className="pill active" style={{ fontSize: '0.78rem', padding: '4px 10px', whiteSpace: 'nowrap' }}>
+          <TrendingDown size={14} /> <strong>-89% Code Reduction</strong>
         </div>
       </div>
 
@@ -168,8 +168,8 @@ export const BoilerplateDemo = view(() => {
       <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px', marginBottom: '32px' }}>
         {/* Tier 1: Standard React */}
         <TorchCode
-          title="Standard React (65 lines)"
-          badge="High Boilerplate"
+          title="React (65 lines)"
+          badge="Boilerplate"
           badgeType="bad"
           highlightLines={[2, 3, 4, 5, 8, 9, 10, 11, 15, 16]}
           code={`// 1. Multiple useState & setters
@@ -207,7 +207,7 @@ return (
         {/* Tier 2: uReact v1 */}
         <TorchCode
           title="uReact v1 (14 lines)"
-          badge="-79% Code"
+          badge="-79%"
           badgeType="good"
           highlightLines={[2, 6, 7, 8]}
           code={`// 1. Unified reactive store
@@ -231,10 +231,10 @@ export const UserView = view(() => (
 ));`}
         />
 
-        {/* Tier 3: uReact Ultra Latest */}
+        {/* Tier 3: uReact v2.2 Latest */}
         <TorchCode
-          title="uReact Ultra Latest (7 lines)"
-          badge="-89.2% Code"
+          title="uReact v2.2 (7 lines)"
+          badge="-89%"
           badgeType="emerald"
           highlightLines={[2, 3, 6, 7, 8]}
           code={`// 1. Reactive proxy store & 1-line CRUD list:
