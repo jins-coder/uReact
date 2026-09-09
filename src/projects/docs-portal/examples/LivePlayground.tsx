@@ -1,7 +1,8 @@
 import React, { useState, useTransition } from 'react';
 import { Play, RotateCcw, Copy, Check, Sparkles, Terminal, Code2, Layers, Cpu, CheckCircle2 } from 'lucide-react';
 import { createStore, view, signal, computed, useSignal, useComputed } from '../../../system';
-import { When, Show, For } from '../../../system/components';
+import { When, Show, For, Scoped } from '../../../system/components';
+
 
 interface Preset {
   id: string;
@@ -132,8 +133,60 @@ export function Dashboard({ user, items, isOnline }) {
     </div>
   );
 }`
+  },
+  {
+    id: 'scoped-styles',
+    name: '<Scoped> CSS & Form Store',
+    category: 'Latest v2.3',
+    description: 'Zero-overhead component-scoped styling and declarative form validation with auto-binding.',
+    code: `// Built-in Scoped CSS & Form Validation Store
+import { Scoped, createFormStore, rules } from 'ureact';
+
+export function ScopedProfile() {
+  return (
+    <Scoped css={\`
+      .profile-card {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(99, 102, 241, 0.1));
+        border: 1px solid #38bdf8;
+        border-radius: 12px;
+        padding: 18px;
+        color: #f8fafc;
+      }
+      .badge {
+        background: #0ea5e9;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+      .btn {
+        background: #38bdf8;
+        color: #0f172a;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    \`}>
+      <div className="profile-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <span className="badge">Scoped Isolation</span>
+          <span style={{ fontSize: '11px', color: '#94a3b8' }}>Zero Leaks</span>
+        </div>
+        <h4>Component Scoped Profile</h4>
+        <p style={{ fontSize: '12px', color: '#94a3b8' }}>
+          CSS rules inside never leak outside to any other element!
+        </p>
+        <button className="btn">Scoped Button</button>
+      </div>
+    </Scoped>
+  );
+}`
   }
 ];
+
 
 export function LivePlayground() {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('signals-v2');
@@ -653,17 +706,66 @@ export function LivePlayground() {
                       {userRole === 'admin' && <div style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>⚡ Full Administrative Privileges Enabled</div>}
                       {userRole === 'editor' && <div style={{ color: '#eab308', fontWeight: 700 }}>📝 Content Editing Mode Enabled</div>}
                       {userRole === 'guest' && <div style={{ color: 'var(--text-dim)' }}>👀 Read-Only Guest View</div>}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>&lt;For&gt; Declarative List:</div>
+                        {todoList.map((item, idx) => (
+                          <div key={idx} style={{ padding: '6px 10px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{idx + 1}.</span>
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+                  </div>
+                )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>&lt;For&gt; Declarative List:</div>
-                      {todoList.map((item, idx) => (
-                        <div key={idx} style={{ padding: '6px 10px', borderRadius: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{idx + 1}.</span>
-                          <span>{item}</span>
+                {selectedPresetId === 'scoped-styles' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <Scoped
+                      css={`
+                        .demo-scoped-card {
+                          background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.12));
+                          border: 1px solid var(--accent-cyan, #38bdf8);
+                          border-radius: 12px;
+                          padding: 18px;
+                        }
+                        .demo-badge {
+                          background: #0ea5e9;
+                          color: #ffffff;
+                          padding: 2px 8px;
+                          border-radius: 9999px;
+                          font-size: 11px;
+                          font-weight: 700;
+                        }
+                        .demo-btn {
+                          background: var(--accent-cyan, #38bdf8);
+                          color: #0f172a;
+                          border: none;
+                          padding: 6px 14px;
+                          border-radius: 6px;
+                          font-weight: 700;
+                          cursor: pointer;
+                          transition: transform 0.15s ease;
+                        }
+                        .demo-btn:hover {
+                          transform: translateY(-1px);
+                        }
+                      `}
+                    >
+                      <div className="demo-scoped-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                          <span className="demo-badge">Auto-Scoped Tag</span>
+                          <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Zero CSS bleed</span>
                         </div>
-                      ))}
-                    </div>
+                        <h4 style={{ margin: '0 0 6px 0', color: 'var(--text-main)' }}>Component Scoped Card</h4>
+                        <p style={{ margin: '0 0 14px 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                          Inspect the DOM to see the unique <code>[data-scope="..."]</code> selector prefix.
+                        </p>
+                        <button className="demo-btn" onClick={() => alert('Scoped CSS button triggered!')}>
+                          Scoped Button Hover
+                        </button>
+                      </div>
+                    </Scoped>
                   </div>
                 )}
               </div>

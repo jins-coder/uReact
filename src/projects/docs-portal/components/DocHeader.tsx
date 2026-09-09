@@ -40,7 +40,7 @@ export function DocHeader({
   onToggleMobileMenu,
   theme = 'light',
   onToggleTheme,
-  currentVersion = '2.2.0-next',
+  currentVersion = '2.3.0',
   onSelectVersion,
   onOpenRoadmap
 }: DocHeaderProps) {
@@ -58,10 +58,11 @@ export function DocHeader({
   }, []);
 
   const versions = [
-    { id: '2.2.0-next', label: 'v2.2.0-next', tag: 'Next / Canary', desc: 'Signals v2, Live Sandbox, Actions' },
-    { id: '2.1.0', label: 'v2.1.0', tag: 'Latest / Stable', desc: 'Concurrent proxy store, $bind, SWR' },
-    { id: '2.0.0', label: 'v2.0.0', tag: 'LTS', desc: 'Original reactive core' }
+    { id: '2.3.0', label: 'v2.3.0', tag: 'Latest / Canary', desc: 'Scoped CSS, Form Store, DevTools HUD' },
+    { id: '2.2.0', label: 'v2.2.0', tag: 'Stable', desc: 'Signals v2, Live Sandbox, Actions' },
+    { id: '2.1.0', label: 'v2.1.0', tag: 'LTS', desc: 'Concurrent proxy store, $bind, SWR' }
   ];
+
 
   return (
     <header

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useShortcut, useRouter, Head } from 'ureact';
+import { useShortcut, useRouter, Head, DevTools, registerDevTools } from 'ureact';
 import { DocHeader } from './components/DocHeader';
 import { DocSidebar } from './components/DocSidebar';
 import { DocTableOfContents } from './components/DocTableOfContents';
@@ -25,14 +25,22 @@ import { HooksReferencePage } from './docs/pages/HooksReferencePage';
 import { CodeReducerLabPage } from './docs/pages/CodeReducerLabPage';
 import { PlaygroundPage } from './docs/pages/PlaygroundPage';
 import { RoadmapPage } from './docs/pages/RoadmapPage';
+import { DevFeaturesPage } from './docs/pages/DevFeaturesPage';
 import { RoadmapModal } from './components/RoadmapModal';
+
 
 export function App() {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentVersion, setCurrentVersion] = useState<'2.2.0-next' | '2.1.0' | '2.0.0'>('2.2.0-next');
+  const [currentVersion, setCurrentVersion] = useState<'2.3.0' | '2.2.0' | '2.1.0'>('2.3.0');
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
+
+  useEffect(() => {
+    // Register global store with DevTools HUD
+    registerDevTools('CanvasStore', 'store', canvasStore);
+  }, []);
+
 
   // Theme state: defaults to light theme (clean react.dev white palette)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -122,8 +130,11 @@ export function App() {
         return <PlaygroundPage />;
       case 'roadmap':
         return <RoadmapPage />;
+      case 'dev-features':
+        return <DevFeaturesPage />;
       default:
         return <QuickstartPage />;
+
     }
   };
 
@@ -262,6 +273,10 @@ export function App() {
         currentVersion={currentVersion}
         onSelectVersion={(v) => setCurrentVersion(v as any)}
       />
+
+      {/* Built-in uReact DevTools HUD */}
+      <DevTools defaultOpen={false} position="bottom-right" />
     </div>
   );
 }
+

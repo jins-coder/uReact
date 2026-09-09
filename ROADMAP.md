@@ -75,7 +75,7 @@ Despite React's dominance, developers across the community have spent the last d
 - [x] **Complete Hooks Reference**: 19 comprehensive hooks with interactive API and example switchers.
 - [x] **Light/Dark Mode Theme Contrast**: Pure CSS variables conforming to the authentic `react.dev` palette.
 
-### v2.2.0-next (Current Canary): Signals v2, Live Sandbox & Beast Tooling
+### v2.2.0: Signals v2, Live Sandbox & Beast Tooling
 - [x] **Signals v2 Reactivity Engine**:
   - `signal<T>(initial)`: Scalar reactive atom with `.value`, `.peek()`, and automatic subscriber tracking.
   - `computed<T>(getter)`: Lazily evaluated, memoized computed signal with auto-dependency subscription.
@@ -85,14 +85,13 @@ Despite React's dominance, developers across the community have spent the last d
   - 4 interactive presets: Signals v2, Form `$bind`, React 19 `<ActionForm>`, and Declarative Control Flow.
   - Live editable code block with instant in-browser preview and real-time state inspector.
 - [x] **React.dev-Style Version Switcher**:
-  - Interactive channel selector dropdown in top header: `v2.2.0-next` (Canary), `v2.1.0` (Stable), `v2.0.0` (LTS).
+  - Interactive channel selector dropdown in top header: `v2.3.0` (Latest), `v2.2.0` (Stable), `v2.1.0` (LTS).
   - Next Version Roadmap Modal (`RoadmapModal.tsx`) & dedicated doc view (`/docs/roadmap`).
 - [x] **Command Palette v3.0 Search Hub (<kbd>Ctrl</kbd>+<kbd>K</kbd>)**:
   - Raycast-style split preview pane with instant hook code snippet copy (<kbd>Ctrl</kbd>+<kbd>C</kbd>).
-  - Zero-allocation pre-indexed search across all 19 hooks and 14 documentation pages.
+  - Zero-allocation pre-indexed search across all 19 hooks and 15 documentation pages.
   - Live expression calculator (type `= 50 * 4` or `calc 1024 / 8` for instant real-time results).
-  - Quick action triggers for version switching, theme toggling, and live playground access.
-- [x] **Beast Mode CodeBlock Engine (`ReactDevCodeBlock.tsx`)**:
+- [x] **Beast Mode CodeBlock Engine (`ReactDevCodeBlock.tsx` & `CodeBlock.tsx`)**:
   - Word wrap toggle (<kbd>WrapText</kbd>) for horizontal scroll vs soft wrapping.
   - 3-step font size zoomer (<kbd>A-</kbd> / <kbd>A</kbd> / <kbd>A+</kbd>).
   - Interactive line pinning & selection on click.
@@ -100,31 +99,50 @@ Despite React's dominance, developers across the community have spent the last d
   - One-click source file download (<kbd>Download</kbd> `.tsx` / `.ts`).
   - Fullscreen focus modal (<kbd>Maximize2</kbd> / <kbd>Esc</kbd>).
   - Single-line compact badges and titles preventing awkward wrapping.
-- [x] **Responsive Polish & Mobile Optimization**:
-  - Scaled down card titles with `clamp()` and `word-break: break-word` to eliminate overflow.
-  - Mobile breakpoint (`<= 640px`) adjustments across all grids, tables, and modal containers.
+
+### v2.3.0 (Latest Release): Developer-Requested Features Engine
+- [x] **Built-in Scoped CSS Engine (`<Scoped>` & `useScopedCSS`)**:
+  - Component-level scoped stylesheets without Tailwind, CSS Modules, or CSS-in-JS runtime bloat.
+  - Automatic selector isolation via unique `[data-scope="us-..."]` injection into `<head>`.
+  - Reference-counted mounting and unmounting for zero memory leaks.
+- [x] **Reactive Form Store & Validation (`createFormStore` & `rules`)**:
+  - Declarative built-in validation rules: `rules.required()`, `rules.email()`, `rules.minLength()`, `rules.pattern()`, `rules.custom()`.
+  - Automatic `$bind` integration, dirty checking (`isDirty`), touch tracking (`touched`), error signals (`errors`), and validity (`isValid`).
+  - Type-safe `handleSubmit(async (values) => ...)` with automatic preventDefault and touch marking.
+- [x] **Universal Reactive State Watcher (`watch` & `useWatchReactive`)**:
+  - Clean `(newValue, oldValue)` observation on signals, stores, or reactive getter functions.
+  - Runs outside or inside React components without stale closures or `useEffect` dependency warning traps.
+- [x] **Built-in DevTools HUD (`<DevTools />` & `registerDevTools`)**:
+  - Floating in-browser HUD accessible via keyboard shortcut (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>) or bottom-right pill.
+  - Live Store & Signal Inspector with JSON tree exploration.
+  - Real-time mutation timeline log with timestamps and rollback telemetry.
+  - Reactivity metrics and subscriber health stats.
+- [x] **Dedicated Documentation & Interactive Demos**:
+  - New `/docs/dev-features` page detailing all 4 developer-requested capabilities with live interactive previews.
+  - Scoped CSS & Form Store preset added to `/docs/playground`.
 
 ---
 
 ## 🚀 What We Need to Take Next (Strategic Roadmap to v3.0)
 
-The following 5 major architectural initiatives represent the next evolutionary leap for uReact:
+The next phase of uReact focuses on build-time compiler optimizations, server-client boundary synchronization, and zero-JS hydration:
 
 ```
-v2.2.0-next (Canary)
+v2.3.0 (Latest)
   │
   ├──► Milestone 1: Ahead-of-Time Zero-Runtime Compiler (RFC-01)
   │
-  ├──► Milestone 2: Built-in Scoped Styling Engine (<style scoped>)
+  ├──► Milestone 2: React Server Component (RSC) Direct Flight Stream Sync
   │
-  ├──► Milestone 3: React Server Component (RSC) Direct Flight Stream Sync
+  ├──► Milestone 3: Resumable Islands Architecture (<Island client:visible>)
   │
-  ├──► Milestone 4: Resumable Islands Architecture (<Island>)
+  ├──► Milestone 4: Edge Mutators & Streaming Action RPC
   │
-  └──► Milestone 5: Visual Reactive State Graph DevTools Extension (Chrome/Edge)
+  └──► Milestone 5: Official Chrome / Edge WebExtension DevTools
 ```
 
 ---
+
 
 ### Milestone 1: Ahead-of-Time Zero-Runtime Compiler (Babel/Vite)
 * **Goal:** Eliminate runtime Proxy overhead by compiling direct property mutations into optimized atom updates at build time.

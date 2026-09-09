@@ -11,4 +11,4 @@ export * from './query';
 export * from './router';
 export * from './utils';
 
-export const VERSION = '2.2.0-next';
+export const VERSION = '2.3.0';

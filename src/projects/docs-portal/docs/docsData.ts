@@ -52,16 +52,31 @@ export const DOC_CATEGORIES: DocCategory[] = [
         id: 'roadmap',
         path: '/docs/roadmap',
         title: 'Next Version & Roadmap',
-        badge: 'v2.2-next',
+        badge: 'v2.3.0',
         badgeType: 'react19',
-        description: 'What is new in v2.2.0-next Canary, Signals v2, and upcoming v3.0 RFCs.',
+        description: 'What is new in v2.3.0 Latest, Signals v2, and upcoming v3.0 RFCs.',
         toc: [
-          { id: 'v22-features', text: '1. v2.2.0 Features' },
+          { id: 'v22-features', text: '1. v2.3.0 Features' },
           { id: 'v30-rfcs', text: '2. v3.0 RFCs' },
           { id: 'changelog', text: '3. Release History' }
         ]
+      },
+      {
+        id: 'dev-features',
+        path: '/docs/dev-features',
+        title: 'Scoped CSS, Forms & DevTools',
+        badge: 'New in v2.3',
+        badgeType: 'new',
+        description: 'Native Scoped CSS, createFormStore validation, watch(), and built-in DevTools HUD.',
+        toc: [
+          { id: 'scoped-css', text: '1. Scoped CSS (<Scoped>)' },
+          { id: 'form-validation', text: '2. Form Store & Rules' },
+          { id: 'reactive-watcher', text: '3. State Watcher (watch)' },
+          { id: 'devtools-hud', text: '4. DevTools HUD & Inspector' }
+        ]
       }
     ]
+
   },
   {
     title: 'REACTIVE STATE (CORE)',
