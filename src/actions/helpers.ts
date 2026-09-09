@@ -1,4 +1,4 @@
-import { useTransition, useState, useCallback, useDeferredValue, use, Context } from 'react';
+import React, { useTransition, useState, useCallback, useDeferredValue, useContext, Context } from 'react';
 import { requestFormReset as rdRequestFormReset } from 'react-dom';
 import { Store } from '../core/types';
 import { useStore } from '../core/state';
@@ -82,6 +82,17 @@ export function useDeferred<T>(value: T, initialValue?: T): T {
  * Safely resolves Promises or Contexts inside Suspense boundaries.
  */
 export function useResource<T>(usable: Promise<T> | Context<T>): T {
+  const nativeUse = (React as any).use;
+  if (typeof nativeUse === 'function') {
+    return nativeUse(usable);
+  }
+
+  // Fallback for Context
+  if (usable && (usable as any).$$typeof === Symbol.for('react.context')) {
+    return useContext(usable as Context<T>);
+  }
+
+  // Fallback for Promise in Suspense
   if (usable && typeof (usable as any).then === 'function') {
     const p: any = usable;
     if (!p.status) {
@@ -97,6 +108,14 @@ export function useResource<T>(usable: Promise<T> | Context<T>): T {
         }
       );
     }
+    if (p.status === 'fulfilled') {
+      return p.value;
+    } else if (p.status === 'rejected') {
+      throw p.reason;
+    } else {
+      throw p;
+    }
   }
-  return use(usable as any);
+
+  return usable as any;
 }
