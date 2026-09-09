@@ -1,5 +1,6 @@
 :root,
 [data-theme="light"] {
+  color-scheme: light;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
@@ -29,8 +30,9 @@
   --code-text: #f8fafc;
 
   --scrollbar-track: transparent;
-  --scrollbar-thumb: #cbd5e1;
-  --scrollbar-thumb-hover: #94a3b8;
+  --scrollbar-thumb: #94a3b8;
+  --scrollbar-thumb-hover: #64748b;
+  --scrollbar-code-thumb: #0284c7;
 
   --callout-note-bg: rgba(2, 132, 199, 0.07);
   --callout-tip-bg: rgba(5, 150, 105, 0.07);
@@ -45,6 +47,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-primary: #07090e;
   --bg-secondary: #0d121d;
   --bg-card: rgba(18, 24, 38, 0.7);
@@ -70,8 +73,9 @@
   --code-text: #f1f5f9;
 
   --scrollbar-track: transparent;
-  --scrollbar-thumb: rgba(148, 163, 184, 0.25);
-  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.45);
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
+  --scrollbar-code-thumb: #38bdf8;
 
   --callout-note-bg: rgba(56, 189, 248, 0.08);
   --callout-tip-bg: rgba(16, 185, 129, 0.08);
@@ -98,70 +102,100 @@ body {
 }
 
 /* ==========================================================================
-   Custom Sleek Scrollbar (Horizontal & Vertical)
+   Universal Sleek Modern Scrollbars (Vertical & Horizontal)
    ========================================================================== */
 
-::-webkit-scrollbar {
-  width: 7px;
-  height: 6px; /* Horizontal scrollbar thickness */
-}
-
-::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 9999px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
-  transition: background 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Firefox standard scrollbars */
+/* Standard CSS Scrollbars (Firefox & Modern Chrome/Edge 121+) */
+html,
+body,
+aside,
+main,
+nav,
+pre,
+div,
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
-/* Horizontal Code Blocks, Pre, and Tables Scrollbar Polish */
+/* Dedicated CSS Scrollbars for Code Blocks */
 pre,
 .code-content,
 .code-box,
-.table-container,
-div[style*="overflow-x"],
-div[style*="overflowX"] {
+.table-container {
   scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) transparent;
+  scrollbar-color: var(--scrollbar-code-thumb) transparent;
 }
 
+/* WebKit & Blink Engine Scrollbars (Chrome, Edge, Safari, Brave, Opera) */
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 8px; /* Sleek vertical scrollbar width */
+  height: 6px; /* Sleek horizontal scrollbar height */
+}
+
+/* Strictly hide all arrow buttons on Windows & Chromium */
+::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Clean track */
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* Floating rounded pill thumb with gentle margins */
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+  border-radius: 9999px !important;
+  border: 2px solid transparent !important;
+  background-clip: content-box !important;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover) !important;
+}
+
+::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* Dedicated Ultra-Thin Horizontal Scrollbar for Code Blocks */
 pre::-webkit-scrollbar,
 .code-content::-webkit-scrollbar,
 .code-box::-webkit-scrollbar {
-  height: 5px; /* Ultra-thin horizontal scrollbar */
+  height: 5px !important;
+  width: 6px !important;
+}
+
+pre::-webkit-scrollbar-track,
+.code-content::-webkit-scrollbar-track,
+.code-box::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-radius: 9999px !important;
 }
 
 pre::-webkit-scrollbar-thumb,
 .code-content::-webkit-scrollbar-thumb,
 .code-box::-webkit-scrollbar-thumb {
-  background: var(--accent-cyan);
-  border-radius: 9999px;
-  opacity: 0.8;
+  background-color: var(--scrollbar-code-thumb) !important;
+  border-radius: 9999px !important;
+  border: none !important;
 }
 
 pre::-webkit-scrollbar-thumb:hover,
 .code-content::-webkit-scrollbar-thumb:hover,
 .code-box::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-indigo);
-  opacity: 1;
+  background-color: var(--accent-indigo) !important;
 }
 
 /* Background Ambient Glow */
@@ -854,3 +888,40 @@ pre::-webkit-scrollbar-thumb:hover,
     font-size: 1.9rem !important;
   }
 }
+
+/* ==========================================================================
+   uReact Brand Logo & Interactive Animation
+   ========================================================================== */
+
+.ureact-logo {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+  transform-origin: center;
+}
+
+.ureact-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.6));
+}
+
+.ureact-orbit {
+  transform-origin: 24px 24px;
+}
+
+.ureact-orbit-1 {
+  animation: orbitSway1 6s ease-in-out infinite alternate;
+}
+
+.ureact-orbit-2 {
+  animation: orbitSway2 6s ease-in-out infinite alternate;
+}
+
+@keyframes orbitSway1 {
+  0% { transform: rotate(-30deg) scale(1); }
+  100% { transform: rotate(-24deg) scale(1.03); }
+}
+
+@keyframes orbitSway2 {
+  0% { transform: rotate(30deg) scale(1); }
+  100% { transform: rotate(36deg) scale(0.98); }
+}
+

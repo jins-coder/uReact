@@ -1,4 +1,5 @@
 import React from 'react';
+import { UReactLogo } from '../../components/UReactLogo';
 import { CodeBlock } from '../../components/CodeBlock';
 import { Callout } from '../../components/Callout';
 import { Sparkles, Terminal, Package, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
@@ -8,7 +9,10 @@ export function QuickstartPage() {
     <article className="doc-content">
       <div className="doc-breadcrumb">Getting Started &gt; Quickstart &amp; Architecture</div>
 
-      <h1 className="doc-title">Quickstart &amp; Architecture</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '18px', margin: '20px 0 16px' }}>
+        <UReactLogo size={54} />
+        <h1 className="doc-title" style={{ margin: 0 }}>Quickstart &amp; Architecture</h1>
+      </div>
       <p className="doc-lead">
         <strong>uReact</strong> is an ergonomic, developer-first framework built directly on top of <strong>React 19</strong>. It eliminates hook dependency arrays, stale closure bugs, and repetitive ceremony across state, forms, async tasks, and control flow—while remaining 100% compatible with native React.
       </p>

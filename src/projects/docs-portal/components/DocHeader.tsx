@@ -1,4 +1,5 @@
 import React from 'react';
+import { UReactLogo } from './UReactLogo';
 import {
   Zap,
   Search,
@@ -63,22 +64,10 @@ export function DocHeader({
 
         <div
           onClick={() => onSelectPage('quickstart')}
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          title="uReact Documentation Home"
         >
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff'
-            }}
-          >
-            <Zap size={18} strokeWidth={2.5} />
-          </div>
+          <UReactLogo size={36} />
           <div>
             <div style={{ fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>uReact</span>

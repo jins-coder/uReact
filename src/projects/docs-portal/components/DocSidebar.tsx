@@ -32,7 +32,7 @@ export function DocSidebar({
         overflowY: 'auto',
         padding: '24px 16px 40px',
         borderRight: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
-        background: 'rgba(7, 9, 14, 0.4)'
+        background: 'var(--bg-sidebar)'
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
