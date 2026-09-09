@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useShortcut, useRouter, Head } from 'ureact';
 import { DocHeader } from './components/DocHeader';
 import { DocSidebar } from './components/DocSidebar';
@@ -28,6 +28,24 @@ export function App() {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Theme state: defaults to light theme (clean react.dev white palette)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ureact-theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('ureact-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // Derive active document page directly from multi-page URL pathname
   const currentPage = useMemo(() => {
@@ -121,6 +139,8 @@ export function App() {
         onSelectPage={handleSelectPage}
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* 3-Column React.dev Documentation Layout */}

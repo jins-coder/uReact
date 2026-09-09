@@ -9,7 +9,9 @@ import {
   TrendingDown,
   Layers,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export interface DocHeaderProps {
@@ -18,6 +20,8 @@ export interface DocHeaderProps {
   onSelectPage: (id: string) => void;
   mobileMenuOpen: boolean;
   onToggleMobileMenu: () => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 export function DocHeader({
@@ -25,7 +29,9 @@ export function DocHeader({
   activeCategory,
   onSelectPage,
   mobileMenuOpen,
-  onToggleMobileMenu
+  onToggleMobileMenu,
+  theme = 'light',
+  onToggleTheme
 }: DocHeaderProps) {
   return (
     <header
@@ -35,8 +41,8 @@ export function DocHeader({
         top: 0,
         zIndex: 100,
         backdropFilter: 'blur(16px)',
-        backgroundColor: 'rgba(7, 9, 14, 0.85)',
-        borderBottom: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
+        backgroundColor: 'var(--bg-header)',
+        borderBottom: '1px solid var(--border-subtle)',
         padding: '0 24px',
         height: '64px',
         display: 'flex',
@@ -64,94 +70,116 @@ export function DocHeader({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, var(--accent-cyan, #38bdf8), var(--accent-indigo, #6366f1))',
+              background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#030712'
+              color: '#ffffff'
             }}
           >
             <Zap size={18} strokeWidth={2.5} />
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', color: '#fff' }}>
-              uReact
+            <div style={{ fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>uReact</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  padding: '1px 6px',
+                  borderRadius: '12px',
+                  background: 'var(--accent-cyan-bg)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--accent-cyan)',
+                  fontWeight: 700
+                }}
+              >
+                react.dev docs
+              </span>
             </div>
           </div>
         </div>
 
-        <span
-          className="pill"
+        <div
           style={{
-            fontSize: '0.72rem',
-            padding: '2px 8px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            borderColor: 'rgba(99, 102, 241, 0.3)',
-            color: '#c7d2fe'
+            fontSize: '0.75rem',
+            color: 'var(--text-dim)',
+            fontFamily: 'var(--font-mono)',
+            paddingLeft: '12px',
+            borderLeft: '1px solid var(--border-subtle)'
           }}
+          className="header-version"
         >
-          v2.1.0 (React 19)
-        </span>
+          v2.1.0
+        </div>
       </div>
 
-      {/* Middle: Global Search bar (like react.dev) */}
-      <button
-        onClick={onOpenSearch}
+      {/* Middle: Global Search Input Trigger */}
+      <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '12px',
-          background: 'rgba(15, 23, 42, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '20px',
-          padding: '6px 16px',
-          color: 'var(--text-muted, #94a3b8)',
-          fontSize: '0.82rem',
-          cursor: 'pointer',
-          width: '280px',
-          transition: 'all 0.2s ease'
+          flex: '0 1 420px',
+          margin: '0 20px'
         }}
-        className="doc-search-trigger"
+        className="header-search-wrapper"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Search size={14} />
-          <span>Search docs &amp; APIs...</span>
-        </div>
-        <kbd
+        <button
+          onClick={onOpenSearch}
           style={{
-            fontSize: '0.7rem',
-            background: 'rgba(255, 255, 255, 0.08)',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: 'var(--text-muted, #94a3b8)'
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '7px 14px',
+            borderRadius: '10px',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-dim)',
+            fontSize: '0.84rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
           }}
+          className="search-trigger-btn"
+          title="Press Ctrl+K or Cmd+K to search documentation"
         >
-          Ctrl+K
-        </kbd>
-      </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Search size={15} />
+            <span>Search React &amp; uReact docs...</span>
+          </div>
+          <kbd
+            style={{
+              padding: '2px 6px',
+              borderRadius: '4px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              fontSize: '0.7rem',
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--accent-cyan)'
+            }}
+          >
+            Ctrl K
+          </kbd>
+        </button>
+      </div>
 
-      {/* Right: Section Links & GitHub */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        <nav className="header-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      {/* Right: Quick Links + Theme Toggle + GitHub */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <nav className="header-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button
             onClick={() => onSelectPage('quickstart')}
-            className={`tab-btn-ghost ${activeCategory === 'quickstart' ? 'active' : ''}`}
+            className={`tab-btn-ghost ${activeCategory === 'GETTING STARTED' ? 'active' : ''}`}
             style={{ fontSize: '0.82rem', padding: '6px 12px' }}
           >
             Learn
           </button>
           <button
-            onClick={() => onSelectPage('reactive-state')}
-            className={`tab-btn-ghost ${activeCategory === 'reactive-state' ? 'active' : ''}`}
+            onClick={() => onSelectPage('hooks-reference')}
+            className={`tab-btn-ghost ${activeCategory === 'REFERENCE & TOOLS' ? 'active' : ''}`}
             style={{ fontSize: '0.82rem', padding: '6px 12px' }}
           >
             Reference
           </button>
           <button
             onClick={() => onSelectPage('react19-actions')}
-            className={`tab-btn-ghost ${activeCategory === 'react19-actions' ? 'active' : ''}`}
+            className={`tab-btn-ghost ${activeCategory === 'REACT 19 NATIVE ENGINE' ? 'active' : ''}`}
             style={{ fontSize: '0.82rem', padding: '6px 12px' }}
           >
             React 19
@@ -159,11 +187,36 @@ export function DocHeader({
           <button
             onClick={() => onSelectPage('code-reducer')}
             className={`tab-btn-ghost ${activeCategory === 'code-reducer' ? 'active' : ''}`}
-            style={{ fontSize: '0.82rem', padding: '6px 12px', color: 'var(--accent-emerald, #10b981)' }}
+            style={{ fontSize: '0.82rem', padding: '6px 12px', color: 'var(--accent-emerald)' }}
           >
             -89% Reducer
           </button>
         </nav>
+
+        {/* Theme Toggle Button */}
+        {onToggleTheme && (
+          <button
+            onClick={onToggleTheme}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-main)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            className="theme-toggle-btn"
+            title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+        )}
 
         <a
           href="https://github.com/facebook/react"
@@ -173,12 +226,12 @@ export function DocHeader({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'var(--text-main, #f8fafc)',
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-main)',
             transition: 'all 0.2s ease'
           }}
           title="View React GitHub"
