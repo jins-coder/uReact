@@ -1,6 +1,7 @@
 import React from 'react';
 import { ALL_DOC_PAGES, DocItem } from '../docs/docsData';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Link } from 'ureact';
 
 export interface DocPaginationProps {
   currentPageId: string;
@@ -27,7 +28,8 @@ export function DocPagination({ currentPageId, onSelectPage }: DocPaginationProp
       }}
     >
       {prevPage ? (
-        <button
+        <Link
+          href={prevPage.path}
           onClick={() => onSelectPage(prevPage.id)}
           style={{
             display: 'flex',
@@ -36,6 +38,7 @@ export function DocPagination({ currentPageId, onSelectPage }: DocPaginationProp
             gap: '4px',
             padding: '12px 18px',
             borderRadius: '10px',
+            textDecoration: 'none',
             background: 'rgba(255, 255, 255, 0.03)',
             border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
             color: 'var(--text-main, #f8fafc)',
@@ -53,13 +56,14 @@ export function DocPagination({ currentPageId, onSelectPage }: DocPaginationProp
           <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--accent-cyan, #38bdf8)' }}>
             {prevPage.title}
           </div>
-        </button>
+        </Link>
       ) : (
         <div />
       )}
 
       {nextPage ? (
-        <button
+        <Link
+          href={nextPage.path}
           onClick={() => onSelectPage(nextPage.id)}
           style={{
             display: 'flex',
@@ -68,6 +72,7 @@ export function DocPagination({ currentPageId, onSelectPage }: DocPaginationProp
             gap: '4px',
             padding: '12px 18px',
             borderRadius: '10px',
+            textDecoration: 'none',
             background: 'rgba(255, 255, 255, 0.03)',
             border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
             color: 'var(--text-main, #f8fafc)',
@@ -85,7 +90,7 @@ export function DocPagination({ currentPageId, onSelectPage }: DocPaginationProp
           <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--accent-cyan, #38bdf8)' }}>
             {nextPage.title}
           </div>
-        </button>
+        </Link>
       ) : (
         <div />
       )}

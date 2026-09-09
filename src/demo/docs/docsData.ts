@@ -5,6 +5,7 @@ export interface TOCItem {
 
 export interface DocItem {
   id: string;
+  path: string;
   title: string;
   badge?: string;
   badgeType?: 'react19' | 'new' | 'reduction' | 'core';
@@ -23,6 +24,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'quickstart',
+        path: '/docs/quickstart',
         title: 'Quickstart & Architecture',
         badge: 'v2.1',
         badgeType: 'core',
@@ -40,6 +42,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'reactive-state',
+        path: '/docs/reactive-state',
         title: 'createStore & view()',
         badge: '0 Hooks',
         badgeType: 'core',
@@ -53,6 +56,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'direct-binding',
+        path: '/docs/direct-binding',
         title: 'store.$bind & Two-Way Binding',
         badge: 'No Boilerplate',
         badgeType: 'reduction',
@@ -65,6 +69,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'collections',
+        path: '/docs/collections',
         title: 'createListStore (1-Line CRUD)',
         badge: 'New in v2.1',
         badgeType: 'new',
@@ -81,6 +86,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'react19-actions',
+        path: '/docs/react19-actions',
         title: 'Actions & useOptimistic',
         badge: 'React 19',
         badgeType: 'react19',
@@ -94,6 +100,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'auto-form',
+        path: '/docs/auto-form',
         title: '<AutoForm> & <ActionForm>',
         badge: '1-Tag Forms',
         badgeType: 'new',
@@ -106,6 +113,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'react19-async',
+        path: '/docs/react19-async',
         title: 'use(Promise) & Suspense',
         badge: 'React 19',
         badgeType: 'react19',
@@ -119,6 +127,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'react19-resources',
+        path: '/docs/react19-resources',
         title: 'Resource Preloading & <Head>',
         badge: 'React 19',
         badgeType: 'react19',
@@ -136,6 +145,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'query-cache',
+        path: '/docs/query-cache',
         title: 'Global Query & SWR Cache',
         badge: 'SWR',
         badgeType: 'core',
@@ -153,6 +163,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'control-flow',
+        path: '/docs/control-flow',
         title: '<When>, <Show>, <For>, <Fetch>',
         badge: 'Clean JSX',
         badgeType: 'core',
@@ -171,6 +182,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'time-travel',
+        path: '/docs/time-travel',
         title: 'Time-Travel & Keyboard Shortcuts',
         badge: 'Undo/Redo',
         badgeType: 'core',
@@ -188,6 +200,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       {
         id: 'hooks-reference',
+        path: '/docs/hooks-reference',
         title: 'Complete Hooks Reference',
         badge: '15+ APIs',
         badgeType: 'core',
@@ -201,6 +214,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
       },
       {
         id: 'code-reducer',
+        path: '/docs/code-reducer',
         title: 'Code Reduction Lab',
         badge: '-89.2% Code',
         badgeType: 'reduction',
@@ -216,3 +230,15 @@ export const DOC_CATEGORIES: DocCategory[] = [
 ];
 
 export const ALL_DOC_PAGES: DocItem[] = DOC_CATEGORIES.flatMap((c) => c.items);
+
+export function getDocPageByPath(path: string): DocItem | undefined {
+  const normalized = path.replace(/\/$/, '') || '/docs/quickstart';
+  return (
+    ALL_DOC_PAGES.find((p) => p.path === normalized || p.id === normalized.replace(/^\/docs\//, '')) ||
+    ALL_DOC_PAGES[0]
+  );
+}
+
+export function getDocPageById(id: string): DocItem {
+  return ALL_DOC_PAGES.find((p) => p.id === id) || ALL_DOC_PAGES[0];
+}

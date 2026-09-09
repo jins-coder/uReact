@@ -1,6 +1,6 @@
 import React from 'react';
 import { DOC_CATEGORIES, DocItem } from '../docs/docsData';
-import { Zap, Sparkles, TrendingDown, Layers } from 'lucide-react';
+import { Link } from 'ureact';
 
 export interface DocSidebarProps {
   activePageId: string;
@@ -55,8 +55,9 @@ export function DocSidebar({
               {cat.items.map((item) => {
                 const isActive = item.id === activePageId;
                 return (
-                  <button
+                  <Link
                     key={item.id}
+                    href={item.path}
                     onClick={() => handleItemClick(item.id)}
                     style={{
                       display: 'flex',
@@ -65,7 +66,7 @@ export function DocSidebar({
                       width: '100%',
                       padding: '8px 12px',
                       borderRadius: '8px',
-                      border: 'none',
+                      textDecoration: 'none',
                       background: isActive ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
                       color: isActive ? 'var(--accent-cyan, #38bdf8)' : 'var(--text-muted, #94a3b8)',
                       fontWeight: isActive ? 600 : 400,
@@ -99,27 +100,18 @@ export function DocSidebar({
                               : 'rgba(255, 255, 255, 0.08)',
                           color:
                             item.badgeType === 'react19'
-                              ? 'var(--accent-amber, #f59e0b)'
+                              ? '#fbbf24'
                               : item.badgeType === 'reduction'
-                              ? 'var(--accent-emerald, #10b981)'
+                              ? '#34d399'
                               : item.badgeType === 'new'
-                              ? 'var(--accent-purple, #a855f7)'
-                              : 'var(--text-muted, #94a3b8)',
-                          border: `1px solid ${
-                            item.badgeType === 'react19'
-                              ? 'rgba(245, 158, 11, 0.3)'
-                              : item.badgeType === 'reduction'
-                              ? 'rgba(16, 185, 129, 0.3)'
-                              : item.badgeType === 'new'
-                              ? 'rgba(168, 85, 247, 0.3)'
-                              : 'rgba(255, 255, 255, 0.1)'
-                          }`
+                              ? '#c084fc'
+                              : 'var(--text-muted, #94a3b8)'
                         }}
                       >
                         {item.badge}
                       </span>
                     )}
-                  </button>
+                  </Link>
                 );
               })}
             </div>

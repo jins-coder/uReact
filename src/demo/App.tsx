@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { useShortcut } from 'ureact';
+import { useShortcut, useRouter, Head } from 'ureact';
 import { DocHeader } from './components/DocHeader';
 import { DocSidebar } from './components/DocSidebar';
 import { DocTableOfContents } from './components/DocTableOfContents';
 import { DocPagination } from './components/DocPagination';
 import { ShortcutMenuModal } from './components/ShortcutMenuModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { ALL_DOC_PAGES, DOC_CATEGORIES } from './docs/docsData';
+import { ALL_DOC_PAGES, DOC_CATEGORIES, getDocPageByPath, getDocPageById } from './docs/docsData';
 import { canvasStore } from './examples/HistoryDemo';
 
 // Import All 13 Documentation Pages
@@ -25,9 +25,16 @@ import { HooksReferencePage } from './docs/pages/HooksReferencePage';
 import { CodeReducerLabPage } from './docs/pages/CodeReducerLabPage';
 
 export function App() {
-  const [activePageId, setActivePageId] = useState<string>('quickstart');
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Derive active document page directly from multi-page URL pathname
+  const currentPage = useMemo(() => {
+    return getDocPageByPath(router.pathname) || ALL_DOC_PAGES[0];
+  }, [router.pathname]);
+
+  const activePageId = currentPage.id;
 
   // Global shortcut to toggle search palette: Ctrl+K or Cmd+K
   useShortcut(['mod+k', 'ctrl+k'], () => setIsSearchOpen((prev) => !prev), { preventDefault: true });
@@ -38,7 +45,13 @@ export function App() {
     setMobileMenuOpen(false);
   });
 
-  // Quick jump shortcuts 1-9
+  const handleSelectPage = (idOrPath: string) => {
+    const item = ALL_DOC_PAGES.find((p) => p.id === idOrPath || p.path === idOrPath) || ALL_DOC_PAGES[0];
+    router.navigate(item.path);
+    setMobileMenuOpen(false);
+  };
+
+  // Quick jump shortcuts 1-9 using multi-page URLs
   useShortcut('1', () => handleSelectPage('quickstart'));
   useShortcut('2', () => handleSelectPage('reactive-state'));
   useShortcut('3', () => handleSelectPage('direct-binding'));
@@ -48,16 +61,6 @@ export function App() {
   useShortcut('7', () => handleSelectPage('react19-async'));
   useShortcut('8', () => handleSelectPage('react19-resources'));
   useShortcut('9', () => handleSelectPage('code-reducer'));
-
-  const handleSelectPage = (id: string) => {
-    setActivePageId(id);
-    setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const currentPage = useMemo(() => {
-    return ALL_DOC_PAGES.find((p) => p.id === activePageId) || ALL_DOC_PAGES[0];
-  }, [activePageId]);
 
   const currentCategoryTitle = useMemo(() => {
     const cat = DOC_CATEGORIES.find((c) => c.items.some((item) => item.id === activePageId));
@@ -99,6 +102,12 @@ export function App() {
 
   return (
     <div>
+      {/* Dynamic Document Head for Multi-Page SEO */}
+      <Head>
+        <title>{`${currentPage.title} — uReact Official Docs`}</title>
+        <meta name="description" content={currentPage.description} />
+      </Head>
+
       {/* Ambient background glow orbs */}
       <div className="ambient-glow">
         <div className="glow-orb-1" />
@@ -189,7 +198,7 @@ export function App() {
               </div>
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-dim, #64748b)' }}>
-              Released under the MIT License. Pure React 19 engine under the hood. No custom compilers required.
+              Released under the MIT License. Multi-page routing enabled. Pure React 19 engine under the hood.
             </div>
           </footer>
         </main>
