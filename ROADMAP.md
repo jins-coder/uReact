@@ -1,23 +1,17 @@
-# 🗺️ uReact Architecture, Completed Milestones & Next-Gen Roadmap
+# 🗺️ uReact Architecture, Releases & Next-Gen Roadmap (v2.3 ➔ v3.0 ➔ v4.0)
 
 > **The Developer-First Framework Built on React.**  
 > Eliminating boilerplate, solving React's architectural gaps, and delivering pure fine-grained reactivity.
 
 ---
 
-## 📌 Table of Contents
-1. [The 7 Critical Features React Missed (Why uReact Exists)](#-the-7-critical-features-react-missed-why-ureact-exists)
-2. [Completed Architecture & Milestones (What We Have Done)](#-completed-architecture--milestones-what-we-have-done)
-   - [v1.0 – v2.0: Core Foundation & React 19 Native](#v10--v20-core-foundation--react-19-native)
-   - [v2.1.0: Concurrent State, Direct Binding & SWR Cache](#v210-concurrent-state-direct-binding--swr-cache)
-   - [v2.2.0-next (Current Canary): Signals v2, Live Sandbox & Beast Tooling](#v220-next-current-canary-signals-v2-live-sandbox--beast-tooling)
-3. [What We Need to Take Next (Strategic Roadmap to v3.0)](#-what-we-need-to-take-next-strategic-roadmap-to-v30)
-   - [Milestone 1: Ahead-of-Time Zero-Runtime Compiler (Babel/Vite)](#milestone-1-ahead-of-time-zero-runtime-compiler-babelvite)
-   - [Milestone 2: Built-in Scoped Styling (`<style scoped>`)](#milestone-2-built-in-scoped-styling-style-scoped)
-   - [Milestone 3: RSC Flight Stream Store Synchronization](#milestone-3-rsc-flight-stream-store-synchronization)
-   - [Milestone 4: Resumable Islands Architecture (`<Island>`)](#milestone-4-resumable-islands-architecture-island)
-   - [Milestone 5: Visual Reactive State Graph DevTools Extension](#milestone-5-visual-reactive-state-graph-devtools-extension)
-4. [Version Comparison Matrix](#-version-comparison-matrix)
+## 📌 Release & Horizon Matrix
+
+| Version | Focus / Theme | Status |
+| :--- | :--- | :--- |
+| **v2.3.0** | **Developer-Requested Engine**: Scoped CSS (`<Scoped>`), Form Store (`createFormStore`, `rules`), Universal Watcher (`watch`), Fault Isolation (`<Catch>`), Quantum DevTools HUD, VS Code Extension (`.vsix`), and Open State Interoperability. | **Stable / Released** 🚀 |
+| **v3.0.0** | **Compiler & Streaming Horizon**: Ahead-of-Time Zero-Runtime Compiler (RFC-01), RSC Flight Stream Sync (RFC-02), Resumable Islands Architecture (RFC-03), Edge Mutators RPC (RFC-04), and WebExtension DevTools (RFC-05). | **Under Active Development / RFC Review** ⚡ |
+| **v4.0.0** | **Autonomous & Multi-Threaded Frontier**: Off-Main-Thread Web Worker / WASM Reactivity, AI-Native Generative UI Streaming, Peer-to-Peer CRDT Local-First Sync, WebGPU Shader UI Bindings, and Federated State Mesh. | **Strategic Vision & Long-Term Roadmap** 🌌 |
 
 ---
 
@@ -35,7 +29,7 @@ Despite React's dominance, developers across the community have spent the last d
 
 ### 3. Property-Level Store Subscriptions (Solving Context Re-render Hell)
 * **The React Problem:** `React.createContext` triggers a re-render on **every consumer component** whenever any property in the context changes, forcing developers to adopt third-party libraries (Zustand, Redux, Jotai).
-* **uReact Solution:** **`createStore` & `view()`**. Deep reactive proxy tracking subscribes components *only* to the specific properties they read during render.
+* **uReact Solution:** **`createStore` & `useStore`**. Deep reactive proxy tracking subscribes components *only* to the specific properties they read during render.
 
 ### 4. Client-Side Top-Level `await` / Native Async Components
 * **The React Problem:** React disallows `async function Component()`. You must maintain 3 separate state variables (`loading`, `data`, `error`) inside `useEffect` or wrap everything in `<Suspense>`.
@@ -58,99 +52,62 @@ Despite React's dominance, developers across the community have spent the last d
 ## 🏆 Completed Architecture & Milestones (What We Have Done)
 
 ### v1.0 – v2.0: Core Foundation & React 19 Native
-- [x] **Deep Proxy Reactivity**: `createStore`, `useStore`, `useLocalStore`, `batch`.
-- [x] **Universal Form Binding**: `store.$bind.property` with automated input synchronization.
-- [x] **Time-Travel Debugging**: `createHistoryStore` with snapshot rollback and Undo/Redo stacks.
-- [x] **Declarative Flow**: `<Show>`, `<When>`, `<For>`, `<Fetch>` primitives.
-- [x] **React 19 Native Action Hooks**:
-  - `useAction`: Unified `useActionState` + `useOptimistic` with typed input and rollback.
-  - `useActionStatus`: Safe `useFormStatus` abstraction.
-  - `useFormReset`: Native React 19 `requestFormReset` execution.
-  - `usePromise`: Direct unwrapping of async promises inside `<Suspense>`.
-  - `<Head>`: Native document title and meta hoisting.
+- [x] Deep Proxy Reactive State Engine (`createStore`, `useStore`).
+- [x] React 19 Action & Transition Integration (`useAction`, `useActionTransition`, `<ActionForm>`).
+- [x] React 19 Native Promises & Suspense Unwrapping (`usePromise`, `useDeferred`).
+- [x] Global Request Cache & SWR Engine (`useQuery`, `useMutation`).
+- [x] Declarative JSX Control Flow (`<Show>`, `<When>`, `<For>`, `<Fetch>`).
 
-### v2.1.0: Concurrent State, Direct Binding & SWR Cache
-- [x] **Concurrent React 18/19 Batching**: Automatic tearing-free state synchronization via `useSyncExternalStore`.
-- [x] **Global SWR Query Cache**: `useQuery` and `useMutation` with global key deduplication and optimistic rollbacks.
-- [x] **Complete Hooks Reference**: 19 comprehensive hooks with interactive API and example switchers.
-- [x] **Light/Dark Mode Theme Contrast**: Pure CSS variables conforming to the authentic `react.dev` palette.
+### v2.1 – v2.2: Fine-Grained Signals & Developer Experience
+- [x] Fine-Grained Signals v2 (`signal()`, `computed()`, `createSignalEffect()`, `useSignal()`).
+- [x] Two-Way Universal Form Binding (`store.$bind`).
+- [x] Interactive In-Browser Live Code Sandbox with preset switcher.
+- [x] Command Palette v3.0 with split preview and instant search.
 
-### v2.2.0: Signals v2, Live Sandbox & Beast Tooling
-- [x] **Signals v2 Reactivity Engine**:
-  - `signal<T>(initial)`: Scalar reactive atom with `.value`, `.peek()`, and automatic subscriber tracking.
-  - `computed<T>(getter)`: Lazily evaluated, memoized computed signal with auto-dependency subscription.
-  - `createSignalEffect(fn)`: Reaction runner that auto-subscribes to all accessed signals with automatic cleanup.
-  - `useSignal()` & `useComputed()`: Seamless JSX component hooks with zero sibling re-renders.
-- [x] **Interactive In-Browser Live Code Playground (`/docs/playground`)**:
-  - 4 interactive presets: Signals v2, Form `$bind`, React 19 `<ActionForm>`, and Declarative Control Flow.
-  - Live editable code block with instant in-browser preview and real-time state inspector.
-- [x] **React.dev-Style Version Switcher**:
-  - Interactive channel selector dropdown in top header: `v2.3.0` (Latest), `v2.2.0` (Stable), `v2.1.0` (LTS).
-  - Next Version Roadmap Modal (`RoadmapModal.tsx`) & dedicated doc view (`/docs/roadmap`).
-- [x] **Command Palette v3.0 Search Hub (<kbd>Ctrl</kbd>+<kbd>K</kbd>)**:
-  - Raycast-style split preview pane with instant hook code snippet copy (<kbd>Ctrl</kbd>+<kbd>C</kbd>).
-  - Zero-allocation pre-indexed search across all 19 hooks and 15 documentation pages.
-  - Live expression calculator (type `= 50 * 4` or `calc 1024 / 8` for instant real-time results).
-- [x] **Beast Mode CodeBlock Engine (`ReactDevCodeBlock.tsx` & `CodeBlock.tsx`)**:
-  - Word wrap toggle (<kbd>WrapText</kbd>) for horizontal scroll vs soft wrapping.
-  - 3-step font size zoomer (<kbd>A-</kbd> / <kbd>A</kbd> / <kbd>A+</kbd>).
-  - Interactive line pinning & selection on click.
-  - Native git diff line rendering (`+` green and `-` red).
-  - One-click source file download (<kbd>Download</kbd> `.tsx` / `.ts`).
-  - Fullscreen focus modal (<kbd>Maximize2</kbd> / <kbd>Esc</kbd>).
-  - Single-line compact badges and titles preventing awkward wrapping.
-
-### v2.3.0 (Latest Release): Developer-Requested Features Engine
-- [x] **Built-in Scoped CSS Engine (`<Scoped>` & `useScopedCSS`)**:
-  - Component-level scoped stylesheets without Tailwind, CSS Modules, or CSS-in-JS runtime bloat.
-  - Automatic selector isolation via unique `[data-scope="us-..."]` injection into `<head>`.
-  - Reference-counted mounting and unmounting for zero memory leaks.
+### v2.3.0 (Current Stable Release): The Developer-Requested Engine
+- [x] **Component-Isolated Scoped CSS (`<Scoped>` & `useScopedCSS`)**:
+  - CSS-in-JS without runtime overhead or Tailwind class pollution.
+  - Automatic `[data-scope="us-..."]` isolation injected into `<head>`.
+  - Reference-counted garbage collection for zero memory leaks.
 - [x] **Reactive Form Store & Validation (`createFormStore` & `rules`)**:
-  - Declarative built-in validation rules: `rules.required()`, `rules.email()`, `rules.minLength()`, `rules.pattern()`, `rules.custom()`.
-  - Automatic `$bind` integration, dirty checking (`isDirty`), touch tracking (`touched`), error signals (`errors`), and validity (`isValid`).
-  - Type-safe `handleSubmit(async (values) => ...)` with automatic preventDefault and touch marking.
+  - Built-in rules: `rules.required()`, `rules.email()`, `rules.minLength()`, `rules.pattern()`, `rules.custom()`.
+  - Full dirty checking (`isDirty`), touch tracking (`touched`), error signals (`errors`), and validity state.
 - [x] **Universal Reactive State Watcher (`watch` & `useWatchReactive`)**:
-  - Clean `(newValue, oldValue)` observation on signals, stores, or reactive getter functions.
-  - Runs outside or inside React components without stale closures or `useEffect` dependency warning traps.
-- [x] **Built-in DevTools HUD (`<DevTools />` & `registerDevTools`)**:
-  - Floating in-browser HUD accessible via keyboard shortcut (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>) or bottom-right pill.
-  - Live Store & Signal Inspector with JSON tree exploration.
-  - Real-time mutation timeline log with timestamps and rollback telemetry.
-  - Reactivity metrics and subscriber health stats.
-- [x] **Official VS Code Developer Extension (`vscode-ureact`)**:
-  - Full autocomplete snippets catalog (`ursignal`, `urcomputed`, `urstore`, `urform`, `urscoped`, `urwatch`, `uraction`, `urdevtools`, etc.).
-  - Rich IntelliSense hover documentation with side-by-side React comparisons.
-  - Interactive Command Palette actions and status bar quick-launch menu (`⚡ uReact v2.3`).
-- [x] **Dedicated Documentation & Interactive Demos**:
-  - New `/docs/dev-features` page detailing all 4 developer-requested capabilities with live interactive previews.
-  - Scoped CSS & Form Store preset added to `/docs/playground`.
+  - Observe state transitions with `(newValue, oldValue)` parameters without `useEffect` stale closure traps.
+- [x] **Resilient Component Fault Isolation (`<Catch>`, `<Isolated>`, `isolate()`)**:
+  - Quarantines unhandled component errors to the crashing component.
+  - Sibling and parent components continue running without crashing the page.
+  - Built-in retry trigger (`↻ Retry`) and collapsible stack trace inspection.
+- [x] **Quantum DevTools HUD (`<DevTools />` & `registerDevTools`)**:
+  - Embedded HUD with 60 FPS meter, 98.4% VDOM bypass gauge, state matrix, and time-travel history scrubber.
+- [x] **Official VS Code Developer Suite Extension (`vscode-ureact`)**:
+  - Complete autocomplete snippet library (`ursignal`, `urstore`, `urform`, `urcatch`, `urdevtools`, etc.).
+  - IntelliSense hover documentation with side-by-side React comparisons.
+  - Packaged standalone `.vsix` ready for instant installation.
+- [x] **Open State Architecture & Zero Lock-In**:
+  - Full interoperability with external state libraries (Zustand, Redux Toolkit, Jotai) and DevTools bridging.
 
 ---
 
-## 🚀 What We Need to Take Next (Strategic Roadmap to v3.0)
-
-The next phase of uReact focuses on build-time compiler optimizations, server-client boundary synchronization, and zero-JS hydration:
+## 🚀 Strategic Roadmap to v3.0: Compiler & Streaming Horizon
 
 ```
-v2.3.0 (Latest)
+v2.3.0 (Current)
   │
-  ├──► Milestone 1: Ahead-of-Time Zero-Runtime Compiler (RFC-01)
+  ├──► RFC-01: Ahead-of-Time Zero-Runtime Compiler (Babel / Vite / SWC)
   │
-  ├──► Milestone 2: React Server Component (RSC) Direct Flight Stream Sync
+  ├──► RFC-02: RSC Direct Flight Stream Store Synchronization
   │
-  ├──► Milestone 3: Resumable Islands Architecture (<Island client:visible>)
+  ├──► RFC-03: Resumable Islands Architecture (<Island client:visible>)
   │
-  ├──► Milestone 4: Edge Mutators & Streaming Action RPC
+  ├──► RFC-04: Edge Mutators & Streaming Action RPC
   │
-  └──► Milestone 5: Official Chrome / Edge WebExtension DevTools
+  └──► RFC-05: Official Chrome / Edge WebExtension DevTools
 ```
 
----
-
-
-### Milestone 1: Ahead-of-Time Zero-Runtime Compiler (Babel/Vite)
+### RFC-01: Ahead-of-Time Zero-Runtime Compiler (Babel/Vite/SWC)
 * **Goal:** Eliminate runtime Proxy overhead by compiling direct property mutations into optimized atom updates at build time.
-* **How it will work:**
+* **How it works:**
   ```tsx
   // What you write (clean, pure JavaScript):
   store.count++;
@@ -162,53 +119,24 @@ v2.3.0 (Latest)
   ```
 * **Developer Advantage:** 100% native object performance with zero garbage collection overhead.
 
----
-
-### Milestone 2: Built-in Scoped Styling (`<style scoped>`)
-* **Goal:** Solve React's styling fragmentation without CSS-in-JS runtime bloat or Tailwind class soup.
-* **How it will work:**
-  ```tsx
-  export function Button({ children }) {
-    return (
-      <button className="btn">
-        {children}
-        <style scoped>{`
-          .btn {
-            background: var(--accent-cyan);
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: transform 0.15s ease;
-          }
-          .btn:hover { transform: translateY(-1px); }
-        `}</style>
-      </button>
-    );
-  }
-  ```
-* **Developer Advantage:** Zero configuration, zero CSS collisions, automatic dead-code elimination, and full SSR compatibility.
-
----
-
-### Milestone 3: RSC Flight Stream Store Synchronization
+### RFC-02: RSC Flight Stream Store Synchronization
 * **Goal:** Bridge the React Server Component (RSC) boundary seamlessly with client proxy stores.
-* **How it will work:**
+* **How it works:**
   ```tsx
   // Server Action:
   export async function updateCart(formData: FormData) {
     'use server';
-    return patchStore(cartStore, { items: [...newItems] });
+    return streamStoreDiff(cartStore, { items: [...newItems] });
   }
 
   // Client Component:
-  // Automatically hydrates server patches into client proxy stores without manual state synchronization!
+  // Automatically hydrates server diffs into client proxy stores without manual state synchronization!
   ```
 * **Developer Advantage:** Zero client hydration lag, no duplicate fetch requests, and automatic optimistic rollbacks.
 
----
-
-### Milestone 4: Resumable Islands Architecture (`<Island>`)
+### RFC-03: Resumable Islands Architecture (`<Island>`)
 * **Goal:** Ship 0KB of JavaScript for static layout and only hydrate interactive components when needed.
-* **How it will work:**
+* **How it works:**
   ```tsx
   // Static content: 0KB JS sent to browser
   <Header />
@@ -221,30 +149,82 @@ v2.3.0 (Latest)
   ```
 * **Developer Advantage:** Perfect 100/100 Lighthouse performance scores and sub-50ms Time-to-Interactive (TTI).
 
----
+### RFC-04: Edge Mutators & Streaming Action RPC
+* **Goal:** Direct bidirectional server mutations with automated rollback on network failure.
+* **How it works:** Edge server mutators directly sync remote and local reactive state trees over a typed WebSocket/SSE tunnel.
 
-### Milestone 5: Visual Reactive State Graph DevTools Extension
-* **Goal:** An official Chrome & Edge DevTools extension providing deep observability into uReact reactive state trees.
-* **Features:**
-  - **Live Dependency Graph**: Visual node tree showing which components read which signals.
-  - **Mutation Timeline**: Step-by-step playback of state changes with time-travel scrubbing.
-  - **Flamechart Profiler**: Highlights exactly which DOM nodes updated and warns against redundant renders.
+### RFC-05: Official WebExtension DevTools
+* **Goal:** Standalone browser extension tab with interactive dependency graph, memory flamecharts, and time-travel replay export.
 
 ---
 
-## 📊 Version Comparison Matrix
+## 🌌 Visionary Roadmap to v4.0: The Autonomous & Multi-Threaded Frontier
 
-| Capability | Standard React 19 | Redux / Zustand | uReact v2.2 (Current) | uReact v3.0 (Planned) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Fine-Grained Signals** | ❌ No | ❌ Selector-based | ✅ `signal()` / `computed()` | ✅ Ahead-of-Time Compiled |
-| **Two-Way Form Binding** | ❌ Manual `onChange` | ❌ Action dispatchers | ✅ Direct `store.$bind` | ✅ Native Type-Safe Forms |
-| **Context Rerender Isolation** | ❌ Cascades to all | ⚠️ Requires selectors | ✅ Automatic Proxy Tracking | ✅ Micro-Atom Tracking |
-| **Built-in SWR Query Engine** | ❌ External dependency | ❌ External dependency | ✅ Core `useQuery` cache | ✅ RSC Streaming Cache |
-| **Declarative Control Flow** | ❌ Nested ternaries | ❌ N/A | ✅ `<Show>`, `<When>`, `<For>` | ✅ Virtualized `<For>` |
-| **Component Scoped Styles** | ❌ None | ❌ None | ⚠️ CSS Modules / Vanilla | ✅ Native `<style scoped>` |
-| **Interactive Code Playground** | ❌ External (CodeSandbox) | ❌ None | ✅ In-Browser Live Sandbox | ✅ WebContainer Sandbox |
-| **Command Palette Search** | ❌ None | ❌ None | ✅ Raycast-style v3.0 Hub | ✅ AI Natural Language Query |
-| **JavaScript Hydration Tax** | ❌ Hydrates all nodes | ❌ Full bundle hydration | ⚠️ Standard hydration | ✅ Resumable Islands (0KB JS) |
+v4.0 takes uReact beyond traditional single-threaded JavaScript runtimes into off-main-thread compute, AI generative UI synthesis, and decentralized local-first reactivity:
+
+```
+v3.0.0 (Compiler & Streaming)
+  │
+  ├──► Pillar 1: Off-Main-Thread Web Worker & WASM Reactivity
+  │
+  ├──► Pillar 2: AI-Native Generative UI Streaming (<AgenticUI>)
+  │
+  ├──► Pillar 3: Peer-to-Peer CRDT Local-First Stores (createSyncStore)
+  │
+  ├──► Pillar 4: Hardware-Accelerated WebGPU Shader UI Bindings
+  │
+  └──► Pillar 5: Zero-Overhead Federated State Mesh (<FederatedStore>)
+```
+
+### Pillar 1: Off-Main-Thread Web Worker & WASM Reactivity
+* **The Vision:** Offload all store derivations, heavy matrix calculations, and reactive graph reconciliations to a background **Web Worker + WASM thread** using `SharedArrayBuffer`.
+* **The Result:** The main browser UI thread handles **only** DOM composition, guaranteeing locked **120 FPS rendering** and zero input latency even under extreme computational workloads.
+
+### Pillar 2: AI-Native Generative UI Streaming (`<AgenticUI>`, `useGenerativeSignal`)
+* **The Vision:** First-class support for LLM streaming tokens directly into typed reactive component trees.
+* **How it works:**
+  ```tsx
+  <AgenticUI
+    prompt="Generate a live financial dashboard for quarterly earnings"
+    schema={FinancialDashboardSchema}
+    fallback={<GeneratingHUD />}
+  />
+  ```
+* **The Result:** Components progressively materialize, validate, and bind reactive signals on-the-fly as AI tokens stream in, with zero full-page flashes or re-renders.
+
+### Pillar 3: Peer-to-Peer CRDT Local-First Sync (`createSyncStore`)
+* **The Vision:** Turn any uReact store into a multiplayer collaborative canvas without requiring a backend database server.
+* **How it works:**
+  ```tsx
+  export const whiteBoardStore = createSyncStore('room-402', {
+    shapes: [],
+    cursors: {}
+  });
+  ```
+* **The Result:** Conflict-Free Replicated Data Types (CRDTs) automatically synchronize direct mutations across peers via WebRTC data channels, with automated offline persistence in IndexedDB.
+
+### Pillar 4: Hardware-Accelerated WebGPU Shader UI Bindings (`useShaderSignal`)
+* **The Vision:** Directly bind reactive signals to GPU compute pipelines and vertex shaders without CPU-GPU bridge overhead.
+* **The Result:** Enables interactive 3D visualizations, physics simulations, and generative UI backdrops rendered natively at GPU frame rates.
+
+### Pillar 5: Zero-Overhead Federated State Mesh (`<FederatedStore>`)
+* **The Vision:** Micro-frontends deployed independently across different origins share a single unified reactive state bus without serialization or `postMessage` overhead.
+
+---
+
+## 📊 Complete Generation Comparison Matrix
+
+| Capability | Standard React 19 | Redux / Zustand | uReact v2.3 (Current) | uReact v3.0 (Planned) | uReact v4.0 (Vision) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Fine-Grained Signals** | ❌ No | ❌ Selector-based | ✅ `signal()` / `computed()` | ✅ AOT Compiled Atoms | ✅ Off-Thread WASM Signals |
+| **Two-Way Form Binding** | ❌ Manual `onChange` | ❌ Action dispatchers | ✅ Direct `store.$bind` | ✅ Native Type-Safe Forms | ✅ AI-Inferred Dynamic Forms |
+| **Context Re-render Hell** | ❌ Cascades to all | ⚠️ Requires selectors | ✅ Automatic Proxy Tracking | ✅ Micro-Atom Tracking | ✅ Zero-Main-Thread Overhead |
+| **Component Fault Isolation** | ⚠️ Heavy Class Boundary | ❌ None | ✅ `<Catch>` / `isolate()` | ✅ Auto-Self-Healing Trees | ✅ Resilient Worker Sandboxes |
+| **DevTools & Telemetry** | ⚠️ Browser Ext Only | ⚠️ Redux DevTools | ✅ Embedded Quantum HUD | ✅ Dedicated Chrome Ext | ✅ AI Telemetry & Diagnostics |
+| **Scoped CSS Styling** | ❌ CSS Modules / Tailwind | ❌ None | ✅ `<Scoped>` + `useScopedCSS` | ✅ AOT Scoped CSS | ✅ GPU Shader Styled Shaders |
+| **JavaScript Hydration Tax** | ❌ Hydrates all nodes | ❌ Full bundle hydration | ⚠️ Standard hydration | ✅ Resumable Islands (0KB JS) | ✅ Instant WASM Hydration |
+| **Multi-User Collaboration** | ❌ Manual WebSockets | ❌ Manual WebSockets | ⚠️ User-implemented | ⚠️ RPC Action Mutators | ✅ Built-in P2P CRDT Stores |
+| **AI Generative UI** | ❌ Manual Parser | ❌ None | ⚠️ SWR streaming | ⚠️ Streaming RPC | ✅ Native `<AgenticUI>` |
 
 ---
 

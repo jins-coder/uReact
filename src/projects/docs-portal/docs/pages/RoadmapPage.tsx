@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Sparkles, Zap, Cpu, Terminal, GitBranch, Rocket, CheckCircle2, Package, Shield, Code2, Globe, Flame, LifeBuoy } from 'lucide-react';
+import { Sparkles, Zap, Cpu, Terminal, GitBranch, Rocket, CheckCircle2, Package, Shield, Code2, Globe, Flame, LifeBuoy, Bot } from 'lucide-react';
 import { Callout } from '../../components/Callout';
 
 export function RoadmapPage() {
-  const [activeTab, setActiveTab] = useState<'v23' | 'v30' | 'changelog'>('v23');
+  const [activeTab, setActiveTab] = useState<'v23' | 'v30' | 'v40' | 'changelog'>('v23');
 
   return (
     <div className="doc-page-container">
@@ -20,16 +20,16 @@ export function RoadmapPage() {
               border: '1px solid var(--border-subtle)'
             }}
           >
-            v2.3.0 Released &amp; v3.0 RFCs
+            v2.3.0 Released ➔ v3.0 RFCs ➔ v4.0 Horizon
           </span>
         </div>
 
         <h1 style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-main)', margin: '0 0 12px 0' }}>
-          uReact Roadmap, Releases &amp; RFC Specifications
+          uReact Roadmap, Releases &amp; Next-Gen Vision
         </h1>
 
         <p style={{ fontSize: '1.1rem', color: 'var(--text-dim)', lineHeight: 1.6, margin: 0 }}>
-          Explore the architecture of uReact v2.3.0 and the upcoming v3.0 Request for Comments (RFCs)—from AOT zero-runtime compilation to resumable islands and RSC stream synchronization.
+          Explore the architecture of uReact v2.3.0, the upcoming v3.0 RFC compiler &amp; streaming specifications, and the visionary v4.0 autonomous multi-threaded horizon.
         </p>
       </div>
 
@@ -82,6 +82,26 @@ export function RoadmapPage() {
         >
           <Rocket size={16} />
           v3.0.0 RFC Specifications (5)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('v40')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: 'none',
+            background: activeTab === 'v40' ? 'rgba(168, 85, 247, 0.15)' : 'transparent',
+            color: activeTab === 'v40' ? '#c084fc' : 'var(--text-dim)',
+            fontWeight: activeTab === 'v40' ? 700 : 500,
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <Bot size={16} />
+          v4.0.0 Autonomous Vision (5)
         </button>
 
         <button
@@ -317,7 +337,122 @@ export function RoadmapPage() {
         </div>
       )}
 
-      {/* Tab 3: Release Changelog */}
+      {/* Tab 3: v4.0.0 Autonomous & Multi-Threaded Vision */}
+      {activeTab === 'v40' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ padding: '24px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, var(--bg-secondary) 100%)', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+              <Bot size={24} color="#c084fc" />
+              <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                uReact v4.0.0: The Autonomous AI-First &amp; Multi-Threaded Substrate
+              </h2>
+              <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', fontWeight: 700 }}>
+                Vision &amp; Strategic Horizon
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              v4.0 breaks free from traditional single-threaded JavaScript execution models. By harnessing background Web Workers, WASM memory buffers, generative AI token streams, and local-first CRDT synchronization, v4.0 transforms uReact into a high-throughput, multi-threaded operating system for web applications.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Pillar 1 */}
+            <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Cpu size={22} color="#38bdf8" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    Pillar 1: Off-Main-Thread Web Worker &amp; WASM Reactivity
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 700 }}>
+                  120 FPS Substrate
+                </span>
+              </div>
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Offloads all reactive dependency graph evaluations, computations, and store mutations to a background Web Worker via <code>SharedArrayBuffer</code>. The main browser UI thread is left 100% free exclusively for rendering pixels, guaranteeing 0ms input latency and zero UI stuttering.
+              </p>
+            </div>
+
+            {/* Pillar 2 */}
+            <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Bot size={22} color="#c084fc" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    Pillar 2: AI-Native Generative UI Streaming (&lt;AgenticUI&gt;)
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', fontWeight: 700 }}>
+                  Agentic Synthesis
+                </span>
+              </div>
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Directly stream LLM tokens from Claude, Gemini, or OpenAI models into typed, fine-grained reactive component trees. Components progressively synthesize, validate against schemas, and mount interactive signals token-by-token with zero layout jumps.
+              </p>
+              <div style={{ padding: '12px 16px', borderRadius: '8px', background: '#040711', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px', color: '#c084fc' }}>
+                {'<AgenticUI prompt="Build interactive chart from analytics feed" schema={ChartSchema} fallback={<SynthesizingHUD />} />'}
+              </div>
+            </div>
+
+            {/* Pillar 3 */}
+            <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Globe size={22} color="#10b981" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    Pillar 3: Local-First Peer-to-Peer CRDT Stores (createSyncStore)
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontWeight: 700 }}>
+                  Decentralized Sync
+                </span>
+              </div>
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Turn any uReact store into a multiplayer collaborative real-time canvas without a dedicated backend server. Conflict-Free Replicated Data Types (CRDTs) automatically synchronize direct mutations across peers via WebRTC data channels with automatic local persistence in IndexedDB.
+              </p>
+            </div>
+
+            {/* Pillar 4 */}
+            <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Flame size={22} color="#f59e0b" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    Pillar 4: Hardware-Accelerated WebGPU Shader UI Bindings
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', fontWeight: 700 }}>
+                  GPU Native
+                </span>
+              </div>
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Directly bind reactive signals to WebGPU compute pipelines and vertex shaders without CPU-GPU bridge serialization bottlenecks. Enables generative UI backdrops, audio visualizations, and 3D data meshes rendered at native monitor refresh rates.
+              </p>
+            </div>
+
+            {/* Pillar 5 */}
+            <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Package size={22} color="#818cf8" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    Pillar 5: Zero-Overhead Federated State Mesh (&lt;FederatedStore&gt;)
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontWeight: 700 }}>
+                  Micro-Frontend Mesh
+                </span>
+              </div>
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Micro-frontends deployed independently across different origins share a single unified reactive state bus without serialization or postMessage overhead, enabling modular enterprise scaling with zero coordination tax.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 4: Release Changelog */}
       {activeTab === 'changelog' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* v2.3.0 */}

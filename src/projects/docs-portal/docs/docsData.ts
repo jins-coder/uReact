@@ -52,13 +52,14 @@ export const DOC_CATEGORIES: DocCategory[] = [
         id: 'roadmap',
         path: '/docs/roadmap',
         title: 'Next Version & Roadmap',
-        badge: 'v2.3.0',
+        badge: 'v2.3 ➔ v4.0',
         badgeType: 'react19',
-        description: 'What is new in v2.3.0 Latest, Signals v2, and upcoming v3.0 RFCs.',
+        description: 'Complete roadmap: v2.3.0 Latest, v3.0.0 RFC Compiler & Streaming, and v4.0.0 Autonomous Multi-Threaded Horizon.',
         toc: [
-          { id: 'v22-features', text: '1. v2.3.0 Features' },
-          { id: 'v30-rfcs', text: '2. v3.0 RFCs' },
-          { id: 'changelog', text: '3. Release History' }
+          { id: 'v23-features', text: '1. v2.3.0 Features' },
+          { id: 'v30-rfcs', text: '2. v3.0 RFC Specifications' },
+          { id: 'v40-vision', text: '3. v4.0 Autonomous Horizon' },
+          { id: 'changelog', text: '4. Release History' }
         ]
       },
       {
