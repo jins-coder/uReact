@@ -697,6 +697,89 @@ pre::-webkit-scrollbar-thumb:hover,
   gap: 8px;
 }
 
+/* Hook Card with Tabs */
+.hook-tab-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-theme="dark"] .hook-tab-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.hook-tab-card:hover {
+  border-color: var(--border-focus);
+}
+
+.hook-tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hook-tab-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hook-tab-name {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.hook-tab-nav {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-card);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.hook-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.hook-tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-secondary);
+}
+
+.hook-tab-btn.active {
+  background: var(--accent-cyan-bg);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.hook-tab-body {
+  padding: 20px;
+}
+
 /* Code Comparison Layout */
 .comparison-grid {
   display: grid;
