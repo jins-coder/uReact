@@ -153,6 +153,22 @@ const UREACT_DOCS: Record<string, DocumentationEntry> = {
     reactComparison: '💡 **React vs uReact**: Eliminates 15KB TanStack Query bundle weight for typical web applications.',
     example: `const { data, loading, error, refetch } = useQuery(\n  'user-profile',\n  () => fetch('/api/me').then(r => r.json()),\n  { staleTime: 30000 }\n);`,
     docUrl: 'http://localhost:3000/docs/data-fetching'
+  },
+  Catch: {
+    title: 'uReact <Catch> Component Fault Isolation',
+    signature: '<Catch fallback?: ReactNode | ((err, retry) => ReactNode) resetKeys?: any[]>{children}</Catch>',
+    summary: 'Component-level fault isolation. If a wrapped component crashes or throws an unhandled error during render, only that component renders a fallback, while all other sibling and parent components continue running without interruption.',
+    reactComparison: '💡 **React vs uReact**: Standard React unmounts the ENTIRE tree on unhandled errors, crashing the app into a white screen. <Catch> confines failures to the offending component with built-in retry capabilities and DevTools telemetry.',
+    example: `<Catch fallback={(err, retry) => (\n  <div>\n    <p>Widget crashed: {err.message}</p>\n    <button onClick={retry}>Retry</button>\n  </div>\n)}>\n  <FlakyWidget />\n</Catch>`,
+    docUrl: 'http://localhost:3000/docs/dev-features#fault-isolation'
+  },
+  isolate: {
+    title: 'uReact isolate() HOC',
+    signature: 'function isolate<P>(Component: React.ComponentType<P>, options?: CatchProps | ReactNode): React.FC<P>',
+    summary: 'Higher-order component that wraps any component with <Catch> for automatic fault isolation and self-healing recovery.',
+    reactComparison: '💡 **React vs uReact**: Turn any third-party or flaky widget into a crash-proof, self-healing component in one line.',
+    example: `export const SafeAnalyticsWidget = isolate(AnalyticsWidget);`,
+    docUrl: 'http://localhost:3000/docs/dev-features#fault-isolation'
   }
 };
 

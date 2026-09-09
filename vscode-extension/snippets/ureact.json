@@ -188,5 +188,26 @@
       "registerDevTools('${1:StoreName}', '${2|store,signal,form,computed|}', ${3:instance});"
     ],
     "description": "Register store, signal, or form for real-time inspection in Quantum DevTools HUD"
+  },
+  "uReact Component Fault Isolation": {
+    "prefix": "urcatch",
+    "body": [
+      "<Catch fallback={(${1:error}, ${2:retry}) => (",
+      "  <div className=\"${3:error-boundary}\">",
+      "    <p>${4:Component failed}: {${1:error}.message}</p>",
+      "    <button onClick={${2:retry}}>${5:Try Again}</button>",
+      "  </div>",
+      ")}>",
+      "  $0",
+      "</Catch>"
+    ],
+    "description": "Quarantine component render errors with <Catch> without crashing sibling components"
+  },
+  "uReact Isolate HOC": {
+    "prefix": "urisolate",
+    "body": [
+      "export const ${1:SafeComponent} = isolate(${2:UnsafeComponent});"
+    ],
+    "description": "Wrap a component with isolate() HOC for automatic fault isolation and recovery"
   }
 }

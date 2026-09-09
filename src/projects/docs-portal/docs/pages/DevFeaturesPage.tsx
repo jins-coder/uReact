@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Scoped, useScopedCSS, createFormStore, rules, watch, useWatchReactive, signal, useSignal, DevTools } from 'ureact';
+import { Scoped, useScopedCSS, createFormStore, rules, watch, useWatchReactive, signal, useSignal, DevTools, Catch, isolate } from 'ureact';
 import { ReactDevCodeBlock } from '../../components/ReactDevCodeBlock';
-import { Sparkles, ShieldCheck, Paintbrush, Activity, Terminal, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Sparkles, ShieldCheck, Paintbrush, Activity, Terminal, CheckCircle2, AlertCircle, LifeBuoy, Flame, RefreshCw } from 'lucide-react';
 
 // Create an interactive form store for the demo
 const demoForm = createFormStore({
@@ -44,6 +44,11 @@ export function DevFeaturesPage() {
   useWatchReactive(watchSignalInstance, (next, prev) => {
     setWatchLogs(l => [`Count changed: prev=${prev ?? 'initial'} ➔ next=${next}`, ...l.slice(0, 4)]);
   });
+
+  // Fault isolation demo state
+  const [shouldCrashWidget, setShouldCrashWidget] = useState(false);
+  const [healthyCount, setHealthyCount] = useState(42);
+
 
 
   return (
@@ -487,6 +492,159 @@ export function App() {
   );
 }`}
           />
+        </div>
+      </section>
+
+      {/* Feature 5: Resilient Component Fault Isolation (<Catch> / <Isolated>) */}
+      <section id="fault-isolation" style={{ marginBottom: '48px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <LifeBuoy size={20} color="#ef4444" />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>
+            5. Resilient Component Fault Isolation (&lt;Catch&gt; / &lt;Isolated&gt;)
+          </h2>
+        </div>
+
+        <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          In standard React, an unhandled render error in any single component causes the <strong>entire component tree to crash</strong> into a blank screen.
+          With uReact's <code>&lt;Catch&gt;</code> (also exported as <code>&lt;Isolated&gt;</code> or <code>isolate()</code>), errors are quarantined to the offending component. All other sibling and parent components <strong>continue to run smoothly without issue</strong>.
+        </p>
+
+        <div style={{ margin: '20px 0' }}>
+          <ReactDevCodeBlock
+            title="ComponentFaultIsolation.tsx"
+            language="tsx"
+            code={`import { Catch, isolate } from 'ureact';
+
+// 1. Declarative JSX Component Boundary
+export function Dashboard() {
+  return (
+    <div className="dashboard-grid">
+      <AnalyticsWidget /> {/* Healthy: continues running! */}
+
+      {/* If WeatherWidget throws, only WeatherWidget renders fallback */}
+      <Catch fallback={(error, retry) => (
+        <div className="error-card">
+          <p>Weather unavailable: {error.message}</p>
+          <button onClick={retry}>Try Again</button>
+        </div>
+      )}>
+        <WeatherWidget />
+      </Catch>
+
+      <ChatWidget />      {/* Healthy: completely unaffected! */}
+    </div>
+  );
+}
+
+// 2. Or wrap any component with the isolate() HOC:
+export const SafeWeather = isolate(WeatherWidget);`}
+          />
+        </div>
+
+        {/* Live Interactive Fault Isolation Demo */}
+        <div
+          style={{
+            marginTop: '24px',
+            padding: '24px',
+            borderRadius: '12px',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            background: 'linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, rgba(15, 23, 42, 0.8) 100%)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#f87171' }}>
+                Interactive Fault Isolation Simulator
+              </h4>
+              <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>
+                Click below to simulate a fatal render crash in the middle widget. Notice that surrounding widgets remain fully operational.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShouldCrashWidget(c => !c)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                background: shouldCrashWidget ? '#10b981' : '#ef4444',
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: shouldCrashWidget ? '0 0 16px rgba(16, 185, 129, 0.4)' : '0 0 16px rgba(239, 68, 68, 0.4)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {shouldCrashWidget ? '✓ Restore Component' : '💥 Simulate Crash in Widget'}
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+            {/* Widget 1: Healthy Live Analytics */}
+            <div style={{ padding: '16px', borderRadius: '10px', background: '#0a0f1d', border: '1px solid #1e293b' }}>
+              <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#38bdf8', fontWeight: 600, letterSpacing: '0.05em' }}>
+                Widget 1: Live Analytics
+              </div>
+              <div style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0', color: '#f8fafc' }}>
+                {healthyCount} req/s
+              </div>
+              <button
+                onClick={() => setHealthyCount(c => c + 1)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  color: '#38bdf8',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                + Bump Metric
+              </button>
+            </div>
+
+            {/* Widget 2: Fault-Isolated Crashable Widget */}
+            <div style={{ padding: '16px', borderRadius: '10px', background: '#0a0f1d', border: '1px solid #1e293b' }}>
+              <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#f59e0b', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '8px' }}>
+                Widget 2: Isolated Zone (&lt;Catch&gt;)
+              </div>
+              
+              <Catch
+                resetKeys={[shouldCrashWidget]}
+                onReset={() => setShouldCrashWidget(false)}
+                isolateScope="WeatherTelemetryWidget"
+              >
+                {shouldCrashWidget ? (
+                  (() => {
+                    throw new Error("Fatal: Weather API payload null reference (504 Gateway Error)");
+                  })()
+                ) : (
+                  <div style={{ padding: '12px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                    <div style={{ color: '#34d399', fontWeight: 600, fontSize: '14px' }}>⛅ Weather Feed Active</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Sunny, 24°C • Wind: 8km/h</div>
+                  </div>
+                )}
+              </Catch>
+            </div>
+
+            {/* Widget 3: Healthy Live Chat */}
+            <div style={{ padding: '16px', borderRadius: '10px', background: '#0a0f1d', border: '1px solid #1e293b' }}>
+              <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#c084fc', fontWeight: 600, letterSpacing: '0.05em' }}>
+                Widget 3: Live Session
+              </div>
+              <div style={{ fontSize: '13px', color: '#e2e8f0', margin: '8px 0' }}>
+                ● 14 users connected to WebSocket room
+              </div>
+              <span style={{ fontSize: '11px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '9999px' }}>
+                100% Uptime
+              </span>
+            </div>
+          </div>
         </div>
       </section>
     </div>
