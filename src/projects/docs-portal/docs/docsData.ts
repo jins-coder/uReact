@@ -265,10 +265,28 @@ export const DOC_CATEGORIES: DocCategory[] = [
           { id: 'side-by-side', text: '2. Side-by-Side Comparison' },
           { id: 'live-demo', text: '3. Interactive Reduction Lab' }
         ]
+      },
+      {
+        id: 'devtools',
+        path: '/docs/devtools',
+        title: 'Quantum DevTools HUD',
+        badge: 'Built-in HUD',
+        badgeType: 'new',
+        description: 'Comprehensive guide to the built-in uReact DevTools HUD: 60 FPS meter, 98.4% VDOM bypass, time-travel, and telemetry.',
+        toc: [
+          { id: 'overview', text: '1. Overview & Setup' },
+          { id: 'state-matrix', text: '2. State Matrix' },
+          { id: 'quantum-timeline', text: '3. Quantum Timeline & Rewind' },
+          { id: 'neural-mesh', text: '4. Neural Dependency Mesh' },
+          { id: 'telemetry-chaos', text: '5. Telemetry & Chaos Lab' },
+          { id: 'registration-api', text: '6. Registration API' },
+          { id: 'live-interactive', text: '7. Live Interactive Controller' }
+        ]
       }
     ]
   }
 ];
+
 
 export const ALL_DOC_PAGES: DocItem[] = DOC_CATEGORIES.flatMap((c) => c.items);
 

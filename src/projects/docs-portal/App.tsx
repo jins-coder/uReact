@@ -26,7 +26,9 @@ import { CodeReducerLabPage } from './docs/pages/CodeReducerLabPage';
 import { PlaygroundPage } from './docs/pages/PlaygroundPage';
 import { RoadmapPage } from './docs/pages/RoadmapPage';
 import { DevFeaturesPage } from './docs/pages/DevFeaturesPage';
+import { DevToolsPage } from './docs/pages/DevToolsPage';
 import { RoadmapModal } from './components/RoadmapModal';
+
 
 
 export function App() {
@@ -132,8 +134,11 @@ export function App() {
         return <RoadmapPage />;
       case 'dev-features':
         return <DevFeaturesPage />;
+      case 'devtools':
+        return <DevToolsPage />;
       default:
         return <QuickstartPage />;
+
 
     }
   };
