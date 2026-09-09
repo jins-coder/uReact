@@ -26,8 +26,22 @@
   --text-muted: #334155;
   --text-dim: #64748b;
 
-  --code-bg: #0f172a;
-  --code-text: #f8fafc;
+  --code-bg: #f8fafc;
+  --code-header-bg: #f1f5f9;
+  --code-border: #e2e8f0;
+  --code-text: #0f172a;
+  --code-line-highlight: rgba(2, 132, 199, 0.08);
+  --code-line-highlight-border: #0284c7;
+
+  /* Torchlight Syntax Tokens (Light) */
+  --tok-comm: #64748b;
+  --tok-kwd: #7c3aed;
+  --tok-func: #0284c7;
+  --tok-str: #059669;
+  --tok-num: #d97706;
+  --tok-tag: #2563eb;
+  --tok-prop: #ea580c;
+  --tok-op: #475569;
 
   --scrollbar-track: transparent;
   --scrollbar-thumb: #94a3b8;
@@ -70,7 +84,21 @@
   --text-dim: #64748b;
 
   --code-bg: #090d16;
+  --code-header-bg: rgba(255, 255, 255, 0.03);
+  --code-border: rgba(255, 255, 255, 0.08);
   --code-text: #f1f5f9;
+  --code-line-highlight: rgba(56, 189, 248, 0.12);
+  --code-line-highlight-border: #38bdf8;
+
+  /* Torchlight Syntax Tokens (Dark) */
+  --tok-comm: #64748b;
+  --tok-kwd: #c084fc;
+  --tok-func: #38bdf8;
+  --tok-str: #34d399;
+  --tok-num: #fbbf24;
+  --tok-tag: #60a5fa;
+  --tok-prop: #fb923c;
+  --tok-op: #94a3b8;
 
   --scrollbar-track: transparent;
   --scrollbar-thumb: #334155;
@@ -511,12 +539,18 @@ pre::-webkit-scrollbar-thumb:hover,
 }
 
 .code-box {
-  background: #0f172a;
-  border: 1px solid var(--border-subtle);
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+[data-theme="dark"] .code-box {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 .code-box.standard {
@@ -524,6 +558,10 @@ pre::-webkit-scrollbar-thumb:hover,
 }
 
 .code-box.ureact {
+  border-color: rgba(2, 132, 199, 0.35);
+}
+
+[data-theme="dark"] .code-box.ureact {
   border-color: rgba(56, 189, 248, 0.4);
 }
 
@@ -531,38 +569,176 @@ pre::-webkit-scrollbar-thumb:hover,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid var(--border-subtle);
-  font-size: 0.85rem;
+  padding: 10px 16px;
+  background: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-border);
+  font-size: 0.82rem;
   font-weight: 600;
+  color: var(--text-main);
 }
 
 .badge-standard {
-  color: #fda4af;
-  background: rgba(244, 63, 94, 0.15);
+  color: var(--accent-rose);
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.25);
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .badge-ureact {
   color: var(--accent-cyan);
   background: var(--accent-cyan-bg);
+  border: 1px solid var(--border-subtle);
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .code-content {
-  padding: 18px;
+  padding: 16px;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   line-height: 1.7;
-  color: #cbd5e1;
+  color: var(--code-text);
   overflow-x: auto;
   flex: 1;
+  background: transparent;
 }
+
+/* ==========================================================================
+   Torchlight Code Block System & Syntax Highlighting
+   ========================================================================== */
+
+.torch-box {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  margin: 12px 0;
+}
+
+[data-theme="dark"] .torch-box {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.torch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-border);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.torch-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+}
+
+.torch-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-red    { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green  { background: #27c93f; }
+
+.torch-title {
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+
+.torch-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.torch-copy-btn:hover {
+  color: var(--text-main);
+  border-color: var(--accent-cyan);
+}
+
+.torch-pre {
+  margin: 0;
+  padding: 14px 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--code-text);
+  background: transparent;
+}
+
+.torch-line {
+  display: flex;
+  padding: 0 16px;
+  transition: background-color 0.15s ease;
+}
+
+.torch-line:hover {
+  background: rgba(2, 132, 199, 0.04);
+}
+
+[data-theme="dark"] .torch-line:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.torch-line.highlighted {
+  background: var(--code-line-highlight);
+  border-left: 3px solid var(--code-line-highlight-border);
+  padding-left: 13px;
+}
+
+.torch-line-num {
+  width: 26px;
+  flex-shrink: 0;
+  text-align: right;
+  margin-right: 16px;
+  color: var(--text-dim);
+  opacity: 0.45;
+  user-select: none;
+  font-size: 0.75rem;
+}
+
+.torch-line-content {
+  flex: 1;
+  white-space: pre;
+}
+
+/* Syntax Highlighting Token Styles */
+.tok-comm { color: var(--tok-comm); font-style: italic; }
+.tok-kwd  { color: var(--tok-kwd); font-weight: 600; }
+.tok-func { color: var(--tok-func); font-weight: 600; }
+.tok-str  { color: var(--tok-str); }
+.tok-num  { color: var(--tok-num); font-weight: 500; }
+.tok-tag  { color: var(--tok-tag); font-weight: 600; }
+.tok-prop { color: var(--tok-prop); }
+.tok-op   { color: var(--tok-op); }
 
 /* Button UI Components */
 .btn {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TorchCode } from '../components/TorchCode';
 import {
   createStore,
   createListStore,
@@ -164,15 +165,14 @@ export const BoilerplateDemo = view(() => {
       </div>
 
       {/* 3-Tier Line-by-Line Code Comparison */}
-      <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+      <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px', marginBottom: '36px' }}>
         {/* Tier 1: Standard React */}
-        <div className="code-box standard">
-          <div className="code-box-header">
-            <span>Standard React (65 lines)</span>
-            <span className="code-box-badge badge-bad">High Boilerplate</span>
-          </div>
-          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
-            <code>{`// 1. Multiple useState & setters
+        <TorchCode
+          title="Standard React (65 lines)"
+          badge="High Boilerplate"
+          badgeType="bad"
+          highlightLines={[2, 3, 4, 5, 8, 9, 10, 11, 15, 16]}
+          code={`// 1. Multiple useState & setters
 const [name, setName] = useState('');
 const [role, setRole] = useState('');
 const [notif, setNotif] = useState(true);
@@ -201,18 +201,16 @@ return (
       </div>
     ))}
   </form>
-);`}</code>
-          </pre>
-        </div>
+);`}
+        />
 
         {/* Tier 2: uReact v1 */}
-        <div className="code-box ureact">
-          <div className="code-box-header">
-            <span>uReact v1 (14 lines)</span>
-            <span className="code-box-badge badge-good">-79% Code</span>
-          </div>
-          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
-            <code>{`// 1. Unified reactive store
+        <TorchCode
+          title="uReact v1 (14 lines)"
+          badge="-79% Code"
+          badgeType="good"
+          highlightLines={[2, 6, 7, 8]}
+          code={`// 1. Unified reactive store
 const user = createStore({ name: '', role: '', notif: true });
 const todos = createStore([]);
 
@@ -230,20 +228,16 @@ export const UserView = view(() => (
       )}
     </For>
   </form>
-));`}</code>
-          </pre>
-        </div>
+));`}
+        />
 
         {/* Tier 3: uReact Ultra Latest */}
-        <div className="code-box" style={{ background: 'rgba(16, 185, 129, 0.04)', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
-          <div className="code-box-header" style={{ borderColor: 'rgba(16, 185, 129, 0.25)' }}>
-            <span style={{ color: 'var(--accent-emerald)', fontWeight: 700 }}>uReact Ultra Latest (7 lines)</span>
-            <span className="code-box-badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: 'var(--accent-emerald)', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
-              -89.2% Code
-            </span>
-          </div>
-          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
-            <code>{`// 1. Reactive proxy store & 1-line CRUD list:
+        <TorchCode
+          title="uReact Ultra Latest (7 lines)"
+          badge="-89.2% Code"
+          badgeType="emerald"
+          highlightLines={[2, 3, 6, 7, 8]}
+          code={`// 1. Reactive proxy store & 1-line CRUD list:
 const user = createStore({ name: '', role: '', notif: true });
 const todos = createListStore([]);
 
@@ -259,9 +253,8 @@ export const UserView = view(() => (
       )}
     </For>
   </AutoForm>
-));`}</code>
-          </pre>
-        </div>
+));`}
+        />
       </div>
 
       {/* Interactive Playgrounds Grid */}
