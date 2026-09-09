@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { Store } from '../core/types';
 import { bind } from '../core/bind';
-import { view } from '../core/view';
+import { useStore } from '../core/state';
 
 export interface FieldOption {
   label: string;
@@ -44,14 +44,16 @@ function formatLabel(key: string): string {
  *   // In JSX:
  *   <AutoForm store={user} onSubmit={(data) => api.save(data)} />
  */
-export const AutoForm = view(<T extends object>({
+export function AutoForm<T extends object>({
   store,
   fields,
   onSubmit,
   submitText = 'Save Changes',
   className = '',
   style = {}
-}: AutoFormProps<T>): React.ReactElement => {
+}: AutoFormProps<T>): React.ReactElement {
+  useStore(store);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (onSubmit) {
@@ -207,4 +209,4 @@ export const AutoForm = view(<T extends object>({
       )}
     </form>
   );
-});
+}

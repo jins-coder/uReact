@@ -1,6 +1,54 @@
-import { useActionState, useOptimistic, useState, useCallback, useTransition } from 'react';
+import React, { useState, useCallback, useTransition, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ActionFn, UseActionOptions, UseActionResult } from './types';
+
+// Resilient fallback for useActionState when running on React 18 or un-polyfilled environments
+function useActionStateFallback<TState, TPayload>(
+  action: (state: Awaited<TState>, payload: TPayload) => Promise<Awaited<TState>>,
+  initialState: Awaited<TState>
+): [Awaited<TState>, (payload: TPayload) => void, boolean] {
+  const [state, setState] = useState<Awaited<TState>>(initialState);
+  const [isPending, startTransition] = useTransition();
+
+  const formAction = useCallback(
+    (payload: TPayload) => {
+      startTransition(async () => {
+        const nextState = await action(state, payload);
+        setState(nextState);
+      });
+    },
+    [action, state]
+  );
+
+  return [state, formAction, isPending];
+}
+
+// Resilient fallback for useOptimistic when running on React 18 or un-polyfilled environments
+function useOptimisticFallback<TState, TUpdate>(
+  passthrough: TState,
+  updateFn: (current: TState, update: TUpdate) => TState
+): [TState, (update: TUpdate) => void] {
+  const [optimisticState, setOptimisticState] = useState<TState>(passthrough);
+
+  useEffect(() => {
+    setOptimisticState(passthrough);
+  }, [passthrough]);
+
+  const setOptimistic = useCallback(
+    (update: TUpdate) => {
+      setOptimisticState((current) => updateFn(current, update));
+    },
+    [updateFn]
+  );
+
+  return [optimisticState, setOptimistic];
+}
+
+const nativeActionState = (React as any).useActionState;
+export const useActionStateImpl = typeof nativeActionState === 'function' ? nativeActionState : useActionStateFallback;
+
+const nativeOptimistic = (React as any).useOptimistic;
+export const useOptimisticImpl = typeof nativeOptimistic === 'function' ? nativeOptimistic : useOptimisticFallback;
 
 /**
  * Supercharged React 19 Action hook.
@@ -45,14 +93,14 @@ export function useAction<TInput, TOutput>(
     }
   };
 
-  // React 19 native useActionState
-  const [state, formAction, isPending]: [TOutput, (payload: any) => void, boolean] = (useActionState as any)(
+  // React 19 native useActionState with resilient fallback
+  const [state, formAction, isPending]: [TOutput, (payload: any) => void, boolean] = (useActionStateImpl as any)(
     wrappedAction,
     initialState
   );
 
-  // React 19 native useOptimistic
-  const [optimisticState, setOptimistic] = useOptimistic<TOutput, TInput>(
+  // React 19 native useOptimistic with resilient fallback
+  const [optimisticState, setOptimistic] = (useOptimisticImpl as any)(
     state,
     (current: TOutput, input: TInput) => {
       if (optimisticUpdate) {

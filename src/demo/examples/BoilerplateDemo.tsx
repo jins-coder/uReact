@@ -136,7 +136,7 @@ export const BoilerplateDemo = view(() => {
       </div>
 
       {/* Code Reduction Metrics Grid */}
-      <div className="metrics-strip" style={{ marginBottom: '28px' }}>
+      <div id="reduction-metrics" className="metrics-strip" style={{ marginBottom: '28px' }}>
         <div className="metric-card">
           <div className="metric-val cyan">store.$bind</div>
           <div className="metric-label">
@@ -164,7 +164,7 @@ export const BoilerplateDemo = view(() => {
       </div>
 
       {/* 3-Tier Line-by-Line Code Comparison */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+      <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '32px' }}>
         {/* Tier 1: Standard React */}
         <div className="code-box standard">
           <div className="code-box-header">
@@ -265,7 +265,7 @@ export const UserView = view(() => (
       </div>
 
       {/* Interactive Playgrounds Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px' }}>
+      <div id="live-demo" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px' }}>
         
         {/* Widget 1: Direct Proxy $bind & $toggle */}
         <div className="widget-card">

@@ -1,7 +1,8 @@
-import { useOptimistic, useTransition, useState, useCallback, useDeferredValue, use, Context } from 'react';
+import { useTransition, useState, useCallback, useDeferredValue, use, Context } from 'react';
 import { requestFormReset as rdRequestFormReset } from 'react-dom';
 import { Store } from '../core/types';
 import { useStore } from '../core/state';
+import { useOptimisticImpl } from './useAction';
 
 /**
  * Standalone React 19 useOptimistic helper.
@@ -11,7 +12,7 @@ export function useOptimisticState<T, U>(
   passthrough: T,
   updateFn: (current: T, update: U) => T
 ): [T, (update: U) => void] {
-  return useOptimistic(passthrough, updateFn);
+  return (useOptimisticImpl as any)(passthrough, updateFn);
 }
 
 /**
@@ -22,7 +23,7 @@ export function useOptimisticStore<T extends object, U>(
   updateFn: (current: T, update: U) => T
 ): [T, (update: U) => void] {
   const currentState = useStore(store);
-  return useOptimistic(currentState, updateFn);
+  return (useOptimisticImpl as any)(currentState, updateFn);
 }
 
 /**
