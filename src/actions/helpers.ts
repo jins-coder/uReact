@@ -1,0 +1,101 @@
+import { useOptimistic, useTransition, useState, useCallback, useDeferredValue, use, Context } from 'react';
+import { requestFormReset as rdRequestFormReset } from 'react-dom';
+import { Store } from '../core/types';
+import { useStore } from '../core/state';
+
+/**
+ * Standalone React 19 useOptimistic helper.
+ * Provides instant optimistic state with automatic rollback.
+ */
+export function useOptimisticState<T, U>(
+  passthrough: T,
+  updateFn: (current: T, update: U) => T
+): [T, (update: U) => void] {
+  return useOptimistic(passthrough, updateFn);
+}
+
+/**
+ * Connects any uReact Store directly to React 19's useOptimistic engine!
+ */
+export function useOptimisticStore<T extends object, U>(
+  store: Store<T>,
+  updateFn: (current: T, update: U) => T
+): [T, (update: U) => void] {
+  const currentState = useStore(store);
+  return useOptimistic(currentState, updateFn);
+}
+
+/**
+ * Resets a form element in React 19 using requestFormReset, with fallback to standard form.reset().
+ */
+export function resetForm(form: HTMLFormElement | null | undefined) {
+  if (!form) return;
+  if (typeof rdRequestFormReset === 'function') {
+    try {
+      rdRequestFormReset(form);
+      return;
+    } catch {
+      // Fallback if invoked outside a transition
+    }
+  }
+  form.reset();
+}
+
+/**
+ * Hook providing a resilient form reset helper.
+ */
+export function useFormReset() {
+  return resetForm;
+}
+
+/**
+ * Enhanced React 19 useTransition hook supporting async actions and automatic error state capture.
+ */
+export function useActionTransition() {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<Error | null>(null);
+
+  const run = useCallback((asyncAction: () => Promise<void> | void) => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        await asyncAction();
+      } catch (err: any) {
+        setError(err instanceof Error ? err : new Error(String(err)));
+      }
+    });
+  }, []);
+
+  return { isPending, run, error, startTransition };
+}
+
+/**
+ * React 19 enhanced useDeferredValue wrapper supporting optional initialValue.
+ */
+export function useDeferred<T>(value: T, initialValue?: T): T {
+  return (useDeferredValue as any)(value, initialValue);
+}
+
+/**
+ * Universal React 19 use() hook wrapper.
+ * Safely resolves Promises or Contexts inside Suspense boundaries.
+ */
+export function useResource<T>(usable: Promise<T> | Context<T>): T {
+  if (usable && typeof (usable as any).then === 'function') {
+    const p: any = usable;
+    if (!p.status) {
+      p.status = 'pending';
+      p.then(
+        (val: any) => {
+          p.status = 'fulfilled';
+          p.value = val;
+        },
+        (err: any) => {
+          p.status = 'rejected';
+          p.reason = err;
+        }
+      );
+    }
+  }
+  return use(usable as any);
+}

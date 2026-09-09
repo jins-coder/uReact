@@ -1,5 +1,17 @@
 import React, { useState, Suspense, startTransition } from 'react';
-import { useAction, useActionStatus, usePromise, Head } from 'ureact';
+import {
+  useAction,
+  useActionStatus,
+  usePromise,
+  useDeferred,
+  useActionTransition,
+  resetForm,
+  preload,
+  preconnect,
+  prefetchDNS,
+  Head,
+  ActionButton
+} from 'ureact';
 import {
   Zap,
   Sparkles,
@@ -10,7 +22,11 @@ import {
   Globe,
   Radio,
   Clock,
-  RotateCcw
+  RotateCcw,
+  Network,
+  Search,
+  Check,
+  RefreshCw
 } from 'lucide-react';
 
 interface Comment {
@@ -100,6 +116,17 @@ export function React19Demo() {
   const [pageTitle, setPageTitle] = useState('uReact v2.1 — Powered by React 19');
   const [resourcePromise, setResourcePromise] = useState(() => createDataPromise());
 
+  // React 19 Resource Preloading Feedback
+  const [preloadStatus, setPreloadStatus] = useState<string | null>(null);
+
+  // React 19 Enhanced useDeferred with initialValue
+  const [queryInput, setQueryInput] = useState('React 19 Server Actions');
+  const deferredQuery = useDeferred(queryInput, 'Initial Query');
+
+  // React 19 Async useActionTransition
+  const asyncTransition = useActionTransition();
+  const [transitionResult, setTransitionResult] = useState<string | null>(null);
+
   // React 19 useAction with automatic useOptimistic
   const action = useAction<
     { author: string; text: string },
@@ -151,6 +178,27 @@ export function React19Demo() {
     });
   };
 
+  const handlePreloadFont = () => {
+    preload('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap', { as: 'style' });
+    setPreloadStatus('✓ preload("https://fonts.googleapis.com/...", { as: "style" }) triggered');
+    setTimeout(() => setPreloadStatus(null), 3500);
+  };
+
+  const handlePreconnectAPI = () => {
+    preconnect('https://api.github.com', { crossOrigin: 'anonymous' });
+    prefetchDNS('https://cdn.jsdelivr.net');
+    setPreloadStatus('✓ preconnect("https://api.github.com") and prefetchDNS("https://cdn.jsdelivr.net") dispatched');
+    setTimeout(() => setPreloadStatus(null), 3500);
+  };
+
+  const handleRunAsyncTransition = () => {
+    asyncTransition.run(async () => {
+      setTransitionResult('⏳ Transition running in background concurrent lane...');
+      await new Promise((r) => setTimeout(r, 1000));
+      setTransitionResult(`✓ Async transition completed at ${new Date().toLocaleTimeString()}`);
+    });
+  };
+
   return (
     <div>
       {/* React 19 Native Document Metadata Hoisting */}
@@ -160,10 +208,10 @@ export function React19Demo() {
         <div>
           <h3 className="panel-title">
             <Zap size={20} style={{ color: 'var(--accent-cyan)' }} />
-            React 19 Native Evolution (Actions, <code>useOptimistic</code>, <code>use(Promise)</code>, Metadata)
+            React 19 Native Helpers Suite (Actions, <code>useOptimistic</code>, <code>use(Promise)</code>, Preloads, <code>useDeferred</code>)
           </h3>
           <p className="panel-subtitle">
-            uReact is built natively on top of <strong>React 19</strong>. Experience concurrent transitions, optimistic UI updates, zero-ceremony form actions, and native <code>&lt;head&gt;</code> document hoisting.
+            All React 19 native primitives implemented with first-class ergonomic helpers in uReact.
           </p>
         </div>
         <div className="pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: 'var(--accent-cyan)' }}>
@@ -171,58 +219,14 @@ export function React19Demo() {
         </div>
       </div>
 
-      {/* Side by side code comparison */}
-      <div className="comparison-grid">
-        <div className="code-box standard">
-          <div className="code-box-header">
-            <span>Standard React 19 (Raw useActionState + useOptimistic)</span>
-            <span className="code-box-badge badge-bad">Ceremony &amp; Boilerplate</span>
-          </div>
-          <pre className="code-content">
-            <code>{`const [state, formAction, isPending] = useActionState(
-  async (prevState, formData) => {
-    const text = formData.get('text');
-    return await saveComment(text);
-  },
-  initialComments
-);
-
-const [optimistic, setOptimistic] = useOptimistic(
-  state,
-  (prev, update) => [...prev, update]
-);
-
-// Manual transition wrapping and FormData parsing`}</code>
-          </pre>
-        </div>
-
-        <div className="code-box ureact">
-          <div className="code-box-header">
-            <span>uReact v2.1 (Unified useAction)</span>
-            <span className="code-box-badge badge-good">One Clean Hook</span>
-          </div>
-          <pre className="code-content">
-            <code>{`// Typed payload + built-in React 19 useOptimistic:
-const action = useAction(
-  saveComment, 
-  initialComments,
-  {
-    optimisticUpdate: (prev, input) => [...prev, input]
-  }
-);
-
-// In JSX:
-<button onClick={() => action.run({ text })}>Post</button>`}</code>
-          </pre>
-        </div>
-      </div>
-
-      <div className="interactive-playground">
-        {/* Left: React 19 Actions & useOptimistic */}
+      {/* Grid of 4 Interactive React 19 Playgrounds */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
+        
+        {/* Widget 1: React 19 Actions & useOptimistic */}
         <div className="widget-card">
           <h4 className="widget-title">
             <MessageSquare size={18} style={{ color: 'var(--accent-cyan)' }} />
-            1. React 19 Actions &amp; Optimistic Comments
+            1. React 19 Actions &amp; <code>useOptimistic</code>
           </h4>
 
           <form
@@ -260,7 +264,7 @@ const action = useAction(
           </form>
 
           {/* Comment list with optimistic indicator */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
             {action.data.map((c) => (
               <div
                 key={c.id}
@@ -300,15 +304,15 @@ const action = useAction(
           </div>
         </div>
 
-        {/* Right: React 19 Document Metadata & use(Promise) */}
+        {/* Widget 2: React 19 Document Metadata & use(Promise) */}
         <div className="widget-card">
           <h4 className="widget-title">
             <Globe size={18} style={{ color: 'var(--accent-indigo)' }} />
-            2. Native React 19 Metadata &amp; use(Promise)
+            2. Native React 19 Metadata &amp; <code>use(Promise)</code>
           </h4>
 
           {/* Metadata Hoisting demo */}
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '18px' }}>
             <span className="form-label" style={{ marginBottom: '6px', display: 'block' }}>
               Native React 19 &lt;Head&gt; Document Hoisting:
             </span>
@@ -320,7 +324,7 @@ const action = useAction(
               placeholder="Edit page title..."
             />
             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Check your browser tab! React 19 hoists <code>&lt;title&gt;</code> directly to the document head.
+              Inspect document head or browser tab! Updates synchronously.
             </p>
           </div>
 
@@ -361,6 +365,119 @@ const action = useAction(
             </Suspense>
           </div>
         </div>
+
+        {/* Widget 3: React 19 Resource Preloading (preload, preconnect, prefetchDNS) */}
+        <div className="widget-card">
+          <h4 className="widget-title">
+            <Network size={18} style={{ color: 'var(--accent-emerald)' }} />
+            3. React 19 Resource Preloading Helpers
+          </h4>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            Built-in React 19 DOM helpers to warm up connections, prefetch DNS, and preload critical assets before navigation:
+          </p>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+            <button
+              onClick={handlePreloadFont}
+              className="btn btn-secondary"
+              style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+            >
+              <code>preload('font/css', 'style')</code>
+            </button>
+            <button
+              onClick={handlePreconnectAPI}
+              className="btn btn-secondary"
+              style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+            >
+              <code>preconnect()</code> &amp; <code>prefetchDNS()</code>
+            </button>
+          </div>
+
+          {preloadStatus && (
+            <div
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                color: 'var(--accent-emerald)',
+                fontSize: '0.82rem'
+              }}
+            >
+              {preloadStatus}
+            </div>
+          )}
+
+          <div style={{ marginTop: '12px', fontSize: '0.78rem', color: 'var(--text-dim)' }}>
+            ✓ Compatible with SSR streaming, link tags hoisting, and modulepreload.
+          </div>
+        </div>
+
+        {/* Widget 4: Async Transition & Enhanced useDeferred */}
+        <div className="widget-card">
+          <h4 className="widget-title">
+            <RefreshCw size={18} style={{ color: 'var(--accent-amber)' }} />
+            4. Async <code>useActionTransition</code> &amp; <code>useDeferred</code>
+          </h4>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            React 19 supports async functions directly in transitions, and <code>useDeferred</code> with initial fallbacks:
+          </p>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label" style={{ marginBottom: '4px', display: 'block' }}>
+              Enhanced <code>useDeferred(val, initial)</code>:
+            </label>
+            <input
+              type="text"
+              className="input-field"
+              value={queryInput}
+              onChange={(e) => setQueryInput(e.target.value)}
+              placeholder="Type search query..."
+            />
+            <div style={{ marginTop: '6px', fontSize: '0.82rem', color: 'var(--accent-cyan)' }}>
+              Deferred value: <strong>"{deferredQuery}"</strong>
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={handleRunAsyncTransition}
+              disabled={asyncTransition.isPending}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, var(--accent-amber), #d97706)',
+                color: '#000',
+                fontWeight: 700
+              }}
+            >
+              {asyncTransition.isPending ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" /> Running Async Transition...
+                </>
+              ) : (
+                'Trigger React 19 Async Transition'
+              )}
+            </button>
+
+            {transitionResult && (
+              <div
+                style={{
+                  marginTop: '10px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: 'var(--accent-amber)',
+                  fontSize: '0.82rem'
+                }}
+              >
+                {transitionResult}
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );
