@@ -13,7 +13,8 @@ import {
   Package,
   History,
   Keyboard,
-  Database
+  Database,
+  Minimize2
 } from 'lucide-react';
 import { useShortcut } from 'ureact';
 import { StateDemo } from './examples/StateDemo';
@@ -23,16 +24,17 @@ import { ControlFlowDemo } from './examples/ControlFlowDemo';
 import { HistoryDemo, canvasStore } from './examples/HistoryDemo';
 import { QueryDemo } from './examples/QueryDemo';
 import { React19Demo } from './examples/React19Demo';
+import { BoilerplateDemo } from './examples/BoilerplateDemo';
 import { ShortcutMenuModal } from './components/ShortcutMenuModal';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'query' | 'react19' | 'underTheHood' | 'quickstart'>('state');
+  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'query' | 'react19' | 'reduction' | 'underTheHood' | 'quickstart'>('state');
   const [isShortcutOpen, setIsShortcutOpen] = useState(false);
 
   // Global shortcut to toggle command palette
   useShortcut(['mod+k', 'ctrl+k'], () => setIsShortcutOpen((prev) => !prev), { preventDefault: true });
 
-  // Quick tab navigation numbers 1-7
+  // Quick tab navigation numbers 1-8
   useShortcut('1', () => setActiveTab('state'));
   useShortcut('2', () => setActiveTab('form'));
   useShortcut('3', () => setActiveTab('async'));
@@ -40,6 +42,7 @@ export function App() {
   useShortcut('5', () => setActiveTab('history'));
   useShortcut('6', () => setActiveTab('query'));
   useShortcut('7', () => setActiveTab('react19'));
+  useShortcut('8', () => setActiveTab('reduction'));
 
   return (
     <div>
@@ -169,6 +172,12 @@ export function App() {
             <Zap size={16} /> React 19 Evolution
           </button>
           <button
+            className={`tab-btn ${activeTab === 'reduction' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reduction')}
+          >
+            <Minimize2 size={16} /> Code Reducer (-79%)
+          </button>
+          <button
             className={`tab-btn ${activeTab === 'underTheHood' ? 'active' : ''}`}
             onClick={() => setActiveTab('underTheHood')}
           >
@@ -191,6 +200,7 @@ export function App() {
           {activeTab === 'history' && <HistoryDemo />}
           {activeTab === 'query' && <QueryDemo />}
           {activeTab === 'react19' && <React19Demo />}
+          {activeTab === 'reduction' && <BoilerplateDemo />}
 
           {/* Under the Hood Deep Dive */}
           {activeTab === 'underTheHood' && (

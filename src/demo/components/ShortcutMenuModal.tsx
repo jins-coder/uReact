@@ -11,7 +11,8 @@ import {
   Layers,
   History,
   CornerDownLeft,
-  Database
+  Database,
+  Minimize2
 } from 'lucide-react';
 
 export interface ShortcutMenuModalProps {
@@ -140,6 +141,17 @@ export function ShortcutMenuModal({
       category: 'Navigation',
       action: () => {
         onSelectTab('react19');
+        onClose();
+      }
+    },
+    {
+      id: 'tab-reduction',
+      title: 'Jump to Code Reducer (-79%)',
+      icon: <Minimize2 size={15} style={{ color: 'var(--accent-emerald)' }} />,
+      keys: ['8'],
+      category: 'Navigation',
+      action: () => {
+        onSelectTab('reduction');
         onClose();
       }
     }

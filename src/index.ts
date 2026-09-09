@@ -13,5 +13,6 @@ export * from './hooks';
 export * from './components';
 export * from './query';
 export * from './actions';
+export * from './utils';
 
 export const VERSION = '2.0.0';

@@ -1,5 +1,6 @@
 import { useSyncExternalStore, useRef, useCallback, useEffect } from 'react';
 import { Listener, Store, Signal, Unsubscribe } from './types';
+import { trackStoreAccess, notifyTrackedStores } from './view';
 
 // Track active batching
 let isBatching = false;
@@ -47,6 +48,7 @@ export function createStore<T extends object>(initialState: T): Store<T> {
     version++;
     // Create a new reference for React's reconciliation
     snapshot = Array.isArray(rawState) ? ([...rawState] as any) : { ...rawState };
+    notifyTrackedStores(rawState);
     if (isBatching) {
       listeners.forEach(l => pendingBatchListeners.add(l));
     } else {
@@ -71,6 +73,7 @@ export function createStore<T extends object>(initialState: T): Store<T> {
 
     const handler: ProxyHandler<object> = {
       get(t: any, prop: string | symbol, receiver: any) {
+        trackStoreAccess(rawState);
         const val = Reflect.get(t, prop, receiver);
         // Bind functions (actions) to the proxy so 'this' refers to reactive state
         if (typeof val === 'function') {
