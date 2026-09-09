@@ -8,7 +8,7 @@ export interface DocItem {
   path: string;
   title: string;
   badge?: string;
-  badgeType?: 'react19' | 'new' | 'reduction' | 'core';
+  badgeType?: 'react19' | 'new' | 'reduction' | 'core' | 'swr' | 'flow' | 'shortcuts';
   description: string;
   toc?: TOCItem[];
 }
@@ -26,7 +26,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
         id: 'quickstart',
         path: '/docs/quickstart',
         title: 'Quickstart & Architecture',
-        badge: 'v2.2',
+        badge: 'v2.3',
         badgeType: 'core',
         description: 'Install uReact, understand the architecture, and build your first component.',
         toc: [
@@ -189,7 +189,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
         path: '/docs/query-cache',
         title: 'Global Query & SWR Cache',
         badge: 'SWR',
-        badgeType: 'core',
+        badgeType: 'swr',
         description: 'Global request deduplication, optimistic mutations, and window refetch.',
         toc: [
           { id: 'use-query', text: '1. useQuery & SWR Engine' },
@@ -207,7 +207,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
         path: '/docs/control-flow',
         title: '<When>, <Show>, <For>, <Fetch>',
         badge: 'Clean JSX',
-        badgeType: 'core',
+        badgeType: 'flow',
         description: 'Eliminate nested ternary operators, .map() boilerplate, and IIFEs.',
         toc: [
           { id: 'show-when', text: '1. <When> & <Show>' },
@@ -226,7 +226,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
         path: '/docs/time-travel',
         title: 'Time-Travel & Keyboard Shortcuts',
         badge: 'Undo/Redo',
-        badgeType: 'core',
+        badgeType: 'shortcuts',
         description: 'Multi-step state history stack and declarative hotkey bindings.',
         toc: [
           { id: 'history-store', text: '1. createHistoryStore' },

@@ -9,6 +9,54 @@ export interface DocSidebarProps {
   onCloseMobileMenu: () => void;
 }
 
+function getBadgeStyle(badgeType?: string): React.CSSProperties {
+  switch (badgeType) {
+    case 'react19':
+      return {
+        background: 'rgba(245, 158, 11, 0.14)',
+        color: 'var(--accent-amber, #f59e0b)',
+        border: '1px solid rgba(245, 158, 11, 0.3)'
+      };
+    case 'reduction':
+      return {
+        background: 'rgba(16, 185, 129, 0.14)',
+        color: 'var(--accent-emerald, #10b981)',
+        border: '1px solid rgba(16, 185, 129, 0.3)'
+      };
+    case 'new':
+      return {
+        background: 'rgba(168, 85, 247, 0.14)',
+        color: 'var(--accent-purple, #a855f7)',
+        border: '1px solid rgba(168, 85, 247, 0.3)'
+      };
+    case 'swr':
+      return {
+        background: 'rgba(6, 182, 212, 0.14)',
+        color: '#06b6d4',
+        border: '1px solid rgba(6, 182, 212, 0.3)'
+      };
+    case 'flow':
+      return {
+        background: 'rgba(244, 63, 94, 0.14)',
+        color: 'var(--accent-rose, #f43f5e)',
+        border: '1px solid rgba(244, 63, 94, 0.3)'
+      };
+    case 'shortcuts':
+      return {
+        background: 'rgba(99, 102, 241, 0.14)',
+        color: 'var(--accent-indigo, #6366f1)',
+        border: '1px solid rgba(99, 102, 241, 0.3)'
+      };
+    case 'core':
+    default:
+      return {
+        background: 'rgba(56, 189, 248, 0.14)',
+        color: 'var(--accent-cyan, #0284c7)',
+        border: '1px solid rgba(56, 189, 248, 0.3)'
+      };
+  }
+}
+
 export function DocSidebar({
   activePageId,
   onSelectPage,
@@ -83,29 +131,21 @@ export function DocSidebar({
 
                     {item.badge && (
                       <span
+                        className={`sidebar-badge badge-${item.badgeType || 'core'}`}
                         style={{
                           fontSize: '0.68rem',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
+                          padding: '2px 7px',
+                          borderRadius: '6px',
                           fontWeight: 700,
                           flexShrink: 0,
                           marginLeft: '8px',
-                          background:
-                            item.badgeType === 'react19'
-                              ? 'rgba(245, 158, 11, 0.15)'
-                              : item.badgeType === 'reduction'
-                              ? 'rgba(16, 185, 129, 0.15)'
-                              : item.badgeType === 'new'
-                              ? 'rgba(168, 85, 247, 0.15)'
-                              : 'rgba(255, 255, 255, 0.08)',
-                          color:
-                            item.badgeType === 'react19'
-                              ? '#fbbf24'
-                              : item.badgeType === 'reduction'
-                              ? '#34d399'
-                              : item.badgeType === 'new'
-                              ? '#c084fc'
-                              : 'var(--text-muted, #94a3b8)'
+                          lineHeight: 1.25,
+                          letterSpacing: '0.02em',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          whiteSpace: 'nowrap',
+                          ...getBadgeStyle(item.badgeType)
                         }}
                       >
                         {item.badge}
