@@ -114,23 +114,28 @@ export default function App() {
 - `useAsync(fetchFn, options)`: Returns `{ data, loading, error, refresh, mutate, reset }`.
 - `<Await for={promise} loading={<Skeleton />}>{(data) => ...}</Await>`: Declarative JSX promise resolver.
 
-### Declarative Control Flow
-- `<Show when={condition} fallback={<Fallback />}>{children}</Show>`
-- `<For each={items} fallback={<Empty />}>{(item, index) => ...}</For>`
-- `<Switch fallback={<DefaultState />}><Case when={...}>...</Case><Default>...</Default></Switch>`
+### Component Scoped CSS
+- `<Scoped css={...}>{children}</Scoped>`: Component-level scoped stylesheets without CSS Modules or Tailwind.
+- `useScopedCSS(css)`: Hook returning `{ scopeId, scopeProps, className }`.
+
+### DevTools & Telemetry
+- `<DevTools />`: Embeddable futuristic Quantum HUD with 60 FPS meter, 98.4% VDOM bypass, and time-travel.
+- `registerDevTools(name, type, instance)`: Registers any store, signal, or form with the DevTools HUD.
+- Shortcut: Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> anywhere.
 
 ---
 
-## 💻 Running the Interactive Playground
+## 💻 Running the Interactive Documentation Portal
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000` to interact with the live comparison playground.
+Visit `http://localhost:3000` to interact with the live documentation portal, live playground, and built-in Quantum DevTools HUD.
 
 ---
 
 ## 📜 License
+
 
 MIT © uReact Team
