@@ -12,5 +12,6 @@ export * from './core';
 export * from './hooks';
 export * from './components';
 export * from './query';
+export * from './actions';
 
-export const VERSION = '1.2.0';
+export const VERSION = '2.0.0';

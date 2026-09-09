@@ -1,9 +1,9 @@
-# uReact (v1.2.0) ⚛️🚀
+# uReact (v2.0.0) ⚛️🚀
 
-> **The Developer-First Framework Built on Top of React.**  
-> React under the hood. Pure velocity and joy on top.
+> **The Developer-First Framework Built on Top of React 19.**  
+> Latest React 19 under the hood. Pure velocity and joy on top.
 
-`uReact` eliminates hook ceremony, dependency array traps, stale closures, and repetitive boilerplate across state management, forms, async tasks, and control flow—while remaining **100% compatible with React 18, Vite, Next.js, and Remix**.
+`uReact` eliminates hook ceremony, dependency array traps, stale closures, and repetitive boilerplate across state management, forms, async tasks, and control flow—while remaining **100% compatible with React 19, Vite, Next.js, and Remix**.
 
 ---
 
@@ -16,13 +16,15 @@ Standard React requires writing significant boilerplate and navigating tricky ho
 - Clunky JSX ternaries and `.map()` key management.
 
 **uReact** solves this by providing:
-1. **Proxy Reactive Stores (`createStore`, `useStore`)**: Direct mutable syntax (`state.user.name = 'Bob'`, `state.cart.push(item)`) rendered cleanly via React's native `useSyncExternalStore`.
-2. **Global Query & SWR Engine (`useQuery`, `useMutation`)**: Automatic global request deduplication, background stale-while-revalidate caching, window focus refetching, and optimistic updates with rollback.
-3. **Time-Travel Stores (`createHistoryStore`, `useHistoryStore`)**: Undo/redo history timeline with zero configuration.
-4. **Two-Way Form Binding (`useForm`)**: One-line field binding (`form.bind('email')`) with automatic validation, touched tracking, and submit handling.
-5. **Zero-Ceremony Async (`useAsync`, `<Await>`)**: Single-line async runner with loading, error states, automatic unmount protection, race-condition safety, and optimistic mutations.
-6. **Declarative Control Flow (`<Show>`, `<For>`, `<Switch>`)**: Clean, readable conditional and list rendering without nested ternaries or manual `.map()` empty checks.
-7. **Ergonomic Utilities**: `useShortcut`, `useInView`, `useQueryParam`, `useDebounce`, `useToggle`, `useLocalStorage`, `useEventListener`.
+1. **React 19 Actions & Optimistic UI (`useAction`, `useActionStatus`)**: Built directly on top of React 19's `useActionState`, `useOptimistic`, and `useFormStatus` with zero boilerplate.
+2. **React 19 Native Metadata & Resource Unwrapping (`<Head>`, `usePromise`)**: Leveraging React 19's native document metadata hoisting and `use(Promise)` suspense resolution.
+3. **Proxy Reactive Stores (`createStore`, `useStore`)**: Direct mutable syntax (`state.user.name = 'Bob'`, `state.cart.push(item)`) rendered cleanly via React's native `useSyncExternalStore`.
+4. **Global Query & SWR Engine (`useQuery`, `useMutation`)**: Automatic global request deduplication, background stale-while-revalidate caching, window focus refetching, and optimistic updates with rollback.
+5. **Time-Travel Stores (`createHistoryStore`, `useHistoryStore`)**: Undo/redo history timeline with zero configuration.
+6. **Two-Way Form Binding (`useForm`)**: One-line field binding (`form.bind('email')`) with automatic validation, touched tracking, and submit handling.
+7. **Zero-Ceremony Async (`useAsync`, `<Await>`)**: Single-line async runner with loading, error states, automatic unmount protection, race-condition safety, and optimistic mutations.
+8. **Declarative Control Flow (`<Show>`, `<For>`, `<Switch>`)**: Clean, readable conditional and list rendering without nested ternaries or manual `.map()` empty checks.
+9. **Ergonomic Utilities**: `useShortcut`, `useInView`, `useQueryParam`, `useDebounce`, `useToggle`, `useLocalStorage`, `useEventListener`.
 
 ---
 

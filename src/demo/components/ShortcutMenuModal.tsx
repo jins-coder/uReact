@@ -131,6 +131,17 @@ export function ShortcutMenuModal({
         onSelectTab('query');
         onClose();
       }
+    },
+    {
+      id: 'tab-react19',
+      title: 'Jump to React 19 Evolution',
+      icon: <Zap size={15} style={{ color: 'var(--accent-cyan)' }} />,
+      keys: ['7'],
+      category: 'Navigation',
+      action: () => {
+        onSelectTab('react19');
+        onClose();
+      }
     }
   ];
 

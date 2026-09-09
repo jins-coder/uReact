@@ -91,10 +91,12 @@ v1.0.0 (Foundation) ──> v1.1.0 (Productivity) ──> v1.2.0 (Query & Cache)
 
 ---
 
-## 💎 v2.0.0 — React 19 Compiler & Full-Stack Evolution
-*Goal: Major architectural evolution aligned with modern React 19 standards.*
+## ✅ v2.0.0 — React 19 Native Evolution *(Released)*
+*Built natively on top of React 19.*
 
-- **React 19 Actions & `useActionState` Alignment**: Native interoperability with React 19 server actions.
-- **Optional Zero-Cost Babel / Vite Compiler Plugin**: Compile-time reactivity analysis that generates fine-grained signals automatically.
-- **RSC (React Server Component) Hydration Bridges**: Stream proxy state from server to client with zero serialization boilerplate.
-- **`ureact/native`**: First-class support for React Native with optimized mobile touch primitives.
+- **React 19 Actions & `useActionState`**: `useAction` hook integrating typed inputs, concurrent transitions, and error capture.
+- **React 19 `useOptimistic`**: Instant 0ms UI optimistic feedback with automated rollback.
+- **React 19 `useFormStatus`**: `useActionStatus` for seamless pending indicators in nested components.
+- **React 19 `use(Promise)`**: `usePromise` hook for direct render unwrapping inside `<Suspense>` boundaries.
+- **React 19 Native Document Metadata**: `<Head>` component leveraging native `<title>` and `<meta>` hoisting.
+- **Ref as a Prop**: Complete elimination of `forwardRef` ceremony across all components.
