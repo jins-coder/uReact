@@ -265,7 +265,7 @@ export function React19Demo() {
 
           {/* Comment list with optimistic indicator */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
-            {action.data.map((c) => (
+            {(action.data || []).map((c) => (
               <div
                 key={c.id}
                 style={{

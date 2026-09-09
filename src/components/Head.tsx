@@ -28,13 +28,7 @@ export function Head({ title, description, children }: HeadProps) {
     }
   }, [title, description]);
 
-  return (
-    <>
-      {title && <title>{title}</title>}
-      {description && <meta name="description" content={description} />}
-      {children}
-    </>
-  );
+  return children ? <>{children}</> : null;
 }
 
 export function useHead(options: { title?: string; description?: string }) {
