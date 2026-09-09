@@ -6,9 +6,12 @@ export interface TorchCodeProps {
   language?: string;
   title?: string;
   badge?: string;
-  badgeType?: 'bad' | 'good' | 'emerald' | 'neutral';
+  badgeType?: 'bad' | 'good' | 'emerald' | 'neutral' | 'react19';
   highlightLines?: number[];
   showLineNumbers?: boolean;
+  collapsible?: boolean;
+  initialCollapsed?: boolean;
+  maxLines?: number;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -21,6 +24,9 @@ export function TorchCode({
   badgeType = 'neutral',
   highlightLines = [],
   showLineNumbers = true,
+  collapsible,
+  initialCollapsed,
+  maxLines,
   className = '',
   style = {}
 }: TorchCodeProps) {
@@ -33,6 +39,9 @@ export function TorchCode({
       badgeType={badgeType}
       highlightLines={highlightLines}
       showLineNumbers={showLineNumbers}
+      collapsible={collapsible}
+      initialCollapsed={initialCollapsed}
+      maxLines={maxLines}
       className={className}
       style={style}
     />
