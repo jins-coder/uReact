@@ -891,6 +891,49 @@ pre::-webkit-scrollbar-thumb:hover,
   color: var(--accent-cyan);
 }
 
+.palette-highlight {
+  background-color: var(--accent-cyan-bg);
+  color: var(--accent-cyan);
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.palette-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.palette-toast {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent-cyan);
+  color: #031327;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: toastPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+@keyframes toastPop {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* Code Comparison Layout */
 .comparison-grid {
   display: grid;

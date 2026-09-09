@@ -25,7 +25,11 @@ import {
   Terminal,
   Clock,
   ArrowRight,
-  Compass
+  Compass,
+  Hash,
+  Share2,
+  Sliders,
+  Trash2
 } from 'lucide-react';
 import { ALL_DOC_PAGES, DocItem } from '../docs/docsData';
 
@@ -54,16 +58,46 @@ export interface PaletteItem {
   icon: React.ReactNode;
   shortcut?: string[];
   action: () => void;
-  // Precomputed search text for zero-allocation fast scanning
+  // Precomputed lowercase search index for zero-allocation performance
   _searchIndex: string;
-  // Extra metadata for rich preview pane
+  // Metadata for split preview pane
   hookSignature?: string;
   hookSnippet?: string;
   docPath?: string;
   toc?: { id: string; text: string }[];
 }
 
-// 1. Static Hook Index for instant lookup with zero runtime overhead
+interface RecentSearchEntry {
+  id: string;
+  title: string;
+  type: PaletteItemType;
+  timestamp: string;
+}
+
+// Helper to highlight matching query substrings safely with zero regex injection
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  if (!query || !query.trim()) return <>{text}</>;
+  
+  const q = query.trim().toLowerCase();
+  const lower = text.toLowerCase();
+  const index = lower.indexOf(q);
+  
+  if (index === -1) return <>{text}</>;
+
+  const before = text.slice(0, index);
+  const match = text.slice(index, index + q.length);
+  const after = text.slice(index + q.length);
+
+  return (
+    <>
+      {before}
+      <mark className="palette-highlight">{match}</mark>
+      {after}
+    </>
+  );
+}
+
+// Static Hook Index: All 19 uReact & React 19 hooks with pre-compiled tokens
 const PALETTE_HOOKS: Omit<PaletteItem, 'action'>[] = [
   {
     id: 'hook-use-action',
@@ -73,9 +107,11 @@ const PALETTE_HOOKS: Omit<PaletteItem, 'action'>[] = [
     category: 'React 19 Hooks',
     badge: 'React 19',
     badgeType: 'react19',
-    icon: <Zap size={16} className="text-amber-500" style={{ color: 'var(--accent-amber)' }} />,
+    icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const action = useAction<TInput, TState>(actionFn, initial, options?);',
-    hookSnippet: `const action = useAction(
+    hookSnippet: `import { useAction } from 'ureact';
+
+const action = useAction(
   async (prev, text) => api.save(text),
   initialData,
   { optimisticUpdate: (prev, text) => [...prev, text] }
@@ -92,7 +128,9 @@ const PALETTE_HOOKS: Omit<PaletteItem, 'action'>[] = [
     badgeType: 'react19',
     icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const { pending, data, method, action } = useActionStatus();',
-    hookSnippet: `const { pending } = useActionStatus();
+    hookSnippet: `import { useActionStatus } from 'ureact';
+
+const { pending } = useActionStatus();
 return <button disabled={pending}>{pending ? 'Saving...' : 'Submit'}</button>;`,
     _searchIndex: 'useactionstatus useformstatus form pending status submit'
   },
@@ -106,23 +144,27 @@ return <button disabled={pending}>{pending ? 'Saving...' : 'Submit'}</button>;`,
     badgeType: 'react19',
     icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const resetForm = useFormReset();',
-    hookSnippet: `const reset = useFormReset();
-reset(formElement); // Dispatches React 19 requestFormReset`,
+    hookSnippet: `import { useFormReset } from 'ureact';
+
+const reset = useFormReset();
+reset(formElement); // Native React 19 requestFormReset`,
     _searchIndex: 'useformreset requestformreset reset form uncontrolled'
   },
   {
     id: 'hook-use-action-transition',
     type: 'hook',
     title: 'useActionTransition()',
-    subtitle: 'React 19 async transition runner with automatic error capture',
+    subtitle: 'React 19 async transition runner with automatic error boundary capture',
     category: 'React 19 Hooks',
     badge: 'Concurrent',
     badgeType: 'react19',
     icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const { run, isPending, error } = useActionTransition();',
-    hookSnippet: `const transition = useActionTransition();
+    hookSnippet: `import { useActionTransition } from 'ureact';
+
+const transition = useActionTransition();
 transition.run(async () => {
-  await fetchTabContent(id);
+  await fetchTab(id);
   setTab(id);
 });`,
     _searchIndex: 'useactiontransition usetransition async concurrent starttransition'
@@ -137,7 +179,9 @@ transition.run(async () => {
     badgeType: 'react19',
     icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const deferredValue = useDeferred<T>(value, initialValue?);',
-    hookSnippet: `const deferredQuery = useDeferred(query, 'Default query');`,
+    hookSnippet: `import { useDeferred } from 'ureact';
+
+const deferredQuery = useDeferred(query, 'Default query');`,
     _searchIndex: 'usedeferred usedeferredvalue fallback concurrent debounce'
   },
   {
@@ -150,7 +194,9 @@ transition.run(async () => {
     badgeType: 'react19',
     icon: <Zap size={16} style={{ color: 'var(--accent-amber)' }} />,
     hookSignature: 'const data = usePromise<T>(promise);',
-    hookSnippet: `// Render unwrapping inside Suspense boundary:
+    hookSnippet: `import { usePromise } from 'ureact';
+
+// Unwraps promise synchronously inside Suspense:
 const user = usePromise(fetchUserPromise);
 return <div>{user.name}</div>;`,
     _searchIndex: 'usepromise use promise suspense unwrap async data'
@@ -165,7 +211,9 @@ return <div>{user.name}</div>;`,
     badgeType: 'core',
     icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
     hookSignature: 'const state = useStore(store);',
-    hookSnippet: `const cart = useStore(cartStore);
+    hookSnippet: `import { createStore, useStore } from 'ureact';
+
+const cart = useStore(cartStore);
 return <button onClick={() => cart.addItem('Item')}>Add</button>;`,
     _searchIndex: 'usestore createstore proxy store state sync external store'
   },
@@ -179,9 +227,11 @@ return <button onClick={() => cart.addItem('Item')}>Add</button>;`,
     badgeType: 'core',
     icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
     hookSignature: 'const state = useLocalStore<T>(initialState);',
-    hookSnippet: `const form = useLocalStore({ name: 'Alex', settings: { dark: true } });
+    hookSnippet: `import { useLocalStore } from 'ureact';
+
+const form = useLocalStore({ name: 'Alex', dark: true });
 // Mutate directly:
-form.settings.dark = false;`,
+form.dark = false;`,
     _searchIndex: 'uselocalstore local store proxy state usestate'
   },
   {
@@ -194,7 +244,9 @@ form.settings.dark = false;`,
     badgeType: 'core',
     icon: <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />,
     hookSignature: 'const [val, setVal, signal] = useSignal(scalarSignal);',
-    hookSnippet: `const [count, setCount] = useSignal(countSignal);`,
+    hookSnippet: `import { signal, useSignal } from 'ureact';
+
+const [count, setCount] = useSignal(countSignal);`,
     _searchIndex: 'usesignal signal scalar reactivity fine grained'
   },
   {
@@ -207,7 +259,9 @@ form.settings.dark = false;`,
     badgeType: 'core',
     icon: <Database size={16} style={{ color: 'var(--accent-indigo)' }} />,
     hookSignature: 'const { data, loading, error, refetch } = useQuery(key, fetcher, options?);',
-    hookSnippet: `const { data, loading } = useQuery('feed', fetchFeed, { staleTime: 10000 });`,
+    hookSnippet: `import { useQuery } from 'ureact';
+
+const { data, loading } = useQuery('feed', fetchFeed, { staleTime: 10000 });`,
     _searchIndex: 'usequery swr cache data fetch request deduplication'
   },
   {
@@ -220,7 +274,9 @@ form.settings.dark = false;`,
     badgeType: 'core',
     icon: <Database size={16} style={{ color: 'var(--accent-indigo)' }} />,
     hookSignature: 'const { mutate, loading, error } = useMutation(fn, options?);',
-    hookSnippet: `const { mutate } = useMutation(updateUser, {
+    hookSnippet: `import { useMutation, setQueryData } from 'ureact';
+
+const { mutate } = useMutation(updateUser, {
   onMutate: (newVal) => setQueryData('user', newVal)
 });`,
     _searchIndex: 'usemutation mutate optimistic rollback server action'
@@ -235,7 +291,9 @@ form.settings.dark = false;`,
     badgeType: 'emerald',
     icon: <Keyboard size={16} style={{ color: 'var(--accent-emerald)' }} />,
     hookSignature: 'useShortcut(keys, handler, options?);',
-    hookSnippet: `useShortcut('mod+k', (e) => {
+    hookSnippet: `import { useShortcut } from 'ureact';
+
+useShortcut('mod+k', (e) => {
   e.preventDefault();
   setIsOpen(prev => !prev);
 });`,
@@ -251,9 +309,58 @@ form.settings.dark = false;`,
     badgeType: 'emerald',
     icon: <Compass size={16} style={{ color: 'var(--accent-emerald)' }} />,
     hookSignature: 'const { ref, inView, entry } = useInView(options?);',
-    hookSnippet: `const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+    hookSnippet: `import { useInView } from 'ureact';
+
+const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
 return <div ref={ref}>{inView ? <Content /> : <Skeleton />}</div>;`,
     _searchIndex: 'useinview intersection observer viewport scroll lazy animation'
+  },
+  {
+    id: 'hook-use-query-param',
+    type: 'hook',
+    title: 'useQueryParam(key, defaultValue)',
+    subtitle: 'Two-way reactive URL search parameter synchronization',
+    category: 'Browser & DOM',
+    badge: 'URL State',
+    badgeType: 'emerald',
+    icon: <Share2 size={16} style={{ color: 'var(--accent-emerald)' }} />,
+    hookSignature: 'const [val, setVal] = useQueryParam(key, defaultValue);',
+    hookSnippet: `import { useQueryParam } from 'ureact';
+
+const [tab, setTab] = useQueryParam('tab', 'all');`,
+    _searchIndex: 'usequeryparam query url search params browser history'
+  },
+  {
+    id: 'hook-use-counter',
+    type: 'hook',
+    title: 'useCounter(initialValue?, options?)',
+    subtitle: '1-line reactive numeric counter with step increments and clamp limits',
+    category: '1-Line Helpers',
+    badge: 'Helper',
+    badgeType: 'emerald',
+    icon: <Sliders size={16} style={{ color: 'var(--accent-emerald)' }} />,
+    hookSignature: 'const counter = useCounter(initialValue?, options?);',
+    hookSnippet: `import { useCounter } from 'ureact';
+
+const qty = useCounter(1, { min: 1, max: 10 });
+// qty.inc(), qty.dec(), qty.reset()`,
+    _searchIndex: 'usecounter counter number numeric increment decrement'
+  },
+  {
+    id: 'hook-use-array',
+    type: 'hook',
+    title: 'useArray(initialItems?)',
+    subtitle: '1-line array state manager with built-in push, remove, and reset',
+    category: '1-Line Helpers',
+    badge: 'Helper',
+    badgeType: 'emerald',
+    icon: <Layers size={16} style={{ color: 'var(--accent-emerald)' }} />,
+    hookSignature: 'const list = useArray<T>(initialItems?);',
+    hookSnippet: `import { useArray } from 'ureact';
+
+const tags = useArray(['React 19', 'uReact']);
+// tags.push('TypeScript'), tags.remove(idx)`,
+    _searchIndex: 'usearray array list items push remove collection state'
   },
   {
     id: 'hook-use-mount',
@@ -265,7 +372,9 @@ return <div ref={ref}>{inView ? <Content /> : <Skeleton />}</div>;`,
     badgeType: 'emerald',
     icon: <Clock size={16} style={{ color: 'var(--accent-emerald)' }} />,
     hookSignature: 'useMount(() => { ... });',
-    hookSnippet: `useMount(() => {
+    hookSnippet: `import { useMount } from 'ureact';
+
+useMount(() => {
   analytics.logPageView();
 });`,
     _searchIndex: 'usemount mount useeffect onmount lifecycle'
@@ -280,7 +389,9 @@ return <div ref={ref}>{inView ? <Content /> : <Skeleton />}</div>;`,
     badgeType: 'emerald',
     icon: <Clock size={16} style={{ color: 'var(--accent-emerald)' }} />,
     hookSignature: 'useUnmount(() => { ... });',
-    hookSnippet: `useUnmount(() => {
+    hookSnippet: `import { useUnmount } from 'ureact';
+
+useUnmount(() => {
   socket.disconnect();
 });`,
     _searchIndex: 'useunmount unmount cleanup teardown lifecycle'
@@ -295,7 +406,9 @@ return <div ref={ref}>{inView ? <Content /> : <Skeleton />}</div>;`,
     badgeType: 'emerald',
     icon: <Clock size={16} style={{ color: 'var(--accent-emerald)' }} />,
     hookSignature: 'useWatch(([curr], [prev]) => { ... }, [deps]);',
-    hookSnippet: `useWatch(([currPrice], [prevPrice]) => {
+    hookSnippet: `import { useWatch } from 'ureact';
+
+useWatch(([currPrice], [prevPrice]) => {
   console.log('Price changed:', prevPrice, '->', currPrice);
 }, [price]);`,
     _searchIndex: 'usewatch watch watcher previous next dependencies effect'
@@ -316,15 +429,60 @@ export function ShortcutMenuModal({
   const [searchTerm, setSearchTerm] = useState('');
   const [activeScope, setActiveScope] = useState<'all' | 'docs' | 'hooks' | 'actions'>('all');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [copiedSnippet, setCopiedSnippet] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [recentItems, setRecentItems] = useState<RecentSearchEntry[]>([]);
 
-  // Performance optimization: Defer search query processing so keystroke input stays 120fps responsive
+  // Performance Optimization: Defer query filtering to keep typing 120fps smooth
   const deferredSearch = useDeferred(searchTerm, '');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Focus input on open & reset state
+  // Load bounded recent history (Max 6) on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ureact_recent_palette');
+      if (saved) {
+        setRecentItems(JSON.parse(saved).slice(0, 6));
+      }
+    } catch {
+      // Ignore storage errors safely
+    }
+  }, [isOpen]);
+
+  const saveRecentItem = useCallback((item: PaletteItem) => {
+    try {
+      const entry: RecentSearchEntry = {
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        timestamp: 'Just now'
+      };
+      setRecentItems((prev) => {
+        const filtered = prev.filter((p) => p.id !== item.id);
+        const next = [entry, ...filtered].slice(0, 6);
+        localStorage.setItem('ureact_recent_palette', JSON.stringify(next));
+        return next;
+      });
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
+  const clearRecentHistory = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRecentItems([]);
+    try {
+      localStorage.removeItem('ureact_recent_palette');
+    } catch {}
+  };
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2000);
+  };
+
+  // Focus on open & reset state
   useEffect(() => {
     if (isOpen) {
       setSearchTerm('');
@@ -354,6 +512,7 @@ export function ShortcutMenuModal({
       shortcut: ['Ctrl', 'T'],
       action: () => {
         onToggleTheme?.();
+        showToast(`Theme switched to ${theme === 'dark' ? 'Light' : 'Dark'} mode!`);
       },
       _searchIndex: 'theme toggle light dark mode appearance switch'
     },
@@ -368,7 +527,10 @@ export function ShortcutMenuModal({
       icon: <Undo2 size={16} style={{ color: canUndo ? 'var(--accent-cyan)' : 'var(--text-dim)' }} />,
       shortcut: ['Ctrl', 'Z'],
       action: () => {
-        if (canUndo) onUndo?.();
+        if (canUndo) {
+          onUndo?.();
+          showToast('Undid state mutation');
+        }
       },
       _searchIndex: 'undo time travel history revert state mutation'
     },
@@ -383,9 +545,27 @@ export function ShortcutMenuModal({
       icon: <Redo2 size={16} style={{ color: canRedo ? 'var(--accent-cyan)' : 'var(--text-dim)' }} />,
       shortcut: ['Ctrl', 'Y'],
       action: () => {
-        if (canRedo) onRedo?.();
+        if (canRedo) {
+          onRedo?.();
+          showToast('Redid state mutation');
+        }
       },
       _searchIndex: 'redo time travel history advance state mutation'
+    },
+    {
+      id: 'action-copy-url',
+      type: 'action' as PaletteItemType,
+      title: 'Copy Current Page URL',
+      subtitle: 'Copy full browser address to clipboard',
+      category: 'Developer Tools',
+      badge: 'Link',
+      badgeType: 'action' as const,
+      icon: <Share2 size={16} style={{ color: 'var(--accent-cyan)' }} />,
+      action: () => {
+        navigator.clipboard.writeText(window.location.href);
+        showToast('Page URL copied to clipboard!');
+      },
+      _searchIndex: 'copy link url share address clipboard'
     },
     {
       id: 'action-github',
@@ -437,6 +617,21 @@ export function ShortcutMenuModal({
     return [...docItems, ...hooks, ...devActions];
   }, [docItems, devActions, onSelectPage, onClose]);
 
+  // Handle prefix scope triggers: typing "@hooks", "@docs", ">"
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+
+    const lower = val.toLowerCase();
+    if (lower.startsWith('@hooks') || lower.startsWith('@hook ')) {
+      setActiveScope('hooks');
+    } else if (lower.startsWith('@docs') || lower.startsWith('@doc ')) {
+      setActiveScope('docs');
+    } else if (lower.startsWith('>') || lower.startsWith('@cmd ')) {
+      setActiveScope('actions');
+    }
+  };
+
   // Filter items using deferredSearch for high typing performance
   const filteredItems = useMemo(() => {
     let list = allPaletteItems;
@@ -445,10 +640,10 @@ export function ShortcutMenuModal({
     if (activeScope === 'hooks') list = list.filter((i) => i.type === 'hook');
     if (activeScope === 'actions') list = list.filter((i) => i.type === 'action');
 
-    const query = deferredSearch.trim().toLowerCase();
-    if (!query) return list;
+    const clean = deferredSearch.replace(/^(@hooks|@hook|@docs|@doc|>|@cmd)\s*/i, '').trim().toLowerCase();
+    if (!clean) return list;
 
-    return list.filter((item) => item._searchIndex.includes(query));
+    return list.filter((item) => item._searchIndex.includes(clean));
   }, [allPaletteItems, activeScope, deferredSearch]);
 
   // Ensure selectedIndex stays valid when list changes
@@ -456,9 +651,21 @@ export function ShortcutMenuModal({
     setSelectedIndex(0);
   }, [filteredItems.length, activeScope]);
 
-  // Keyboard navigation handler for ArrowUp, ArrowDown, Enter
+  const selectedItem = filteredItems[selectedIndex] || filteredItems[0];
+
+  // Keyboard navigation handler for ArrowUp, ArrowDown, Enter, Ctrl+C
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (filteredItems.length === 0) return;
+
+    // Ctrl+C / Cmd+C hotkey to copy code snippet of selected hook or page link
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+      if (selectedItem?.hookSnippet) {
+        e.preventDefault();
+        navigator.clipboard.writeText(selectedItem.hookSnippet);
+        showToast('Code snippet copied to clipboard!');
+        return;
+      }
+    }
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -478,17 +685,15 @@ export function ShortcutMenuModal({
       e.preventDefault();
       const current = filteredItems[selectedIndex];
       if (current) {
+        saveRecentItem(current);
         current.action();
       }
     }
   };
 
-  const selectedItem = filteredItems[selectedIndex] || filteredItems[0];
-
   const handleCopySnippet = (snippet: string) => {
     navigator.clipboard.writeText(snippet);
-    setCopiedSnippet(true);
-    setTimeout(() => setCopiedSnippet(false), 2000);
+    showToast('Code snippet copied!');
   };
 
   if (!isOpen) return null;
@@ -522,11 +727,14 @@ export function ShortcutMenuModal({
                 <Keyboard size={18} />
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                  uReact Command Palette &amp; Search
+                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>uReact Command Palette &amp; Search</span>
+                  <span style={{ fontSize: '0.66rem', padding: '1px 6px', borderRadius: '4px', background: 'var(--accent-cyan-bg)', color: 'var(--accent-cyan)', border: '1px solid var(--border-subtle)', fontWeight: 700 }}>
+                    v2.0
+                  </span>
                 </div>
                 <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                  Search 19+ hooks, documentation pages, or execute live actions
+                  Search 19+ hooks, documentation pages, or type <code>@hook</code>, <code>@doc</code>, <code>&gt;</code> for scope
                 </div>
               </div>
             </div>
@@ -555,9 +763,9 @@ export function ShortcutMenuModal({
               ref={inputRef}
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Type a command, hook (e.g. useAction), or page..."
+              placeholder="Search hooks (e.g. useAction), pages, or commands..."
               style={{
                 width: '100%',
                 padding: '10px 14px 10px 38px',
@@ -614,6 +822,51 @@ export function ShortcutMenuModal({
         <div className="palette-split-view">
           {/* Left: Interactive Navigable Items List */}
           <div className="palette-list-pane">
+            {/* Recent History Section when search is empty */}
+            {!searchTerm.trim() && recentItems.length > 0 && activeScope === 'all' && (
+              <div style={{ marginBottom: '12px' }}>
+                <div className="palette-history-header">
+                  <span>Recent Visited</span>
+                  <button
+                    onClick={clearRecentHistory}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '3px' }}
+                    title="Clear history"
+                  >
+                    <Trash2 size={11} /> Clear
+                  </button>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', padding: '0 4px 6px' }}>
+                  {recentItems.map((r) => (
+                    <div
+                      key={r.id}
+                      onClick={() => {
+                        const target = allPaletteItems.find((p) => p.id === r.id);
+                        if (target) {
+                          saveRecentItem(target);
+                          target.action();
+                        }
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-subtle)',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        color: 'var(--text-main)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Clock size={11} style={{ color: 'var(--accent-cyan)' }} />
+                      <span>{r.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {filteredItems.length === 0 ? (
               <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
                 <Search size={24} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
@@ -631,7 +884,10 @@ export function ShortcutMenuModal({
                       key={item.id}
                       ref={(el) => { itemRefs.current[idx] = el; }}
                       className={`palette-item ${isSelected ? 'selected' : ''}`}
-                      onClick={() => item.action()}
+                      onClick={() => {
+                        saveRecentItem(item);
+                        item.action();
+                      }}
                       onMouseEnter={() => setSelectedIndex(idx)}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
@@ -640,7 +896,7 @@ export function ShortcutMenuModal({
                         </div>
                         <div style={{ overflow: 'hidden' }}>
                           <div style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                            {item.title}
+                            <HighlightMatch text={item.title} query={deferredSearch.replace(/^(@hooks|@hook|@docs|@doc|>|@cmd)\s*/i, '')} />
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                             {item.subtitle}
@@ -750,15 +1006,16 @@ export function ShortcutMenuModal({
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          color: copiedSnippet ? 'var(--accent-emerald)' : 'var(--text-dim)',
+                          color: 'var(--text-dim)',
                           fontSize: '0.74rem',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '4px'
                         }}
+                        title="Copy Code (Ctrl+C)"
                       >
-                        {copiedSnippet ? <Check size={12} /> : <Copy size={12} />}
-                        {copiedSnippet ? 'Copied!' : 'Copy'}
+                        <Copy size={12} />
+                        <span>Copy Code</span>
                       </button>
                     </div>
 
@@ -810,7 +1067,10 @@ export function ShortcutMenuModal({
                 {/* Bottom Primary Action Button */}
                 <div style={{ marginTop: 'auto', paddingTop: '14px' }}>
                   <button
-                    onClick={() => selectedItem.action()}
+                    onClick={() => {
+                      saveRecentItem(selectedItem);
+                      selectedItem.action();
+                    }}
                     className="btn btn-primary"
                     style={{
                       width: '100%',
@@ -855,13 +1115,22 @@ export function ShortcutMenuModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span><kbd style={{ padding: '2px 5px', borderRadius: '3px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>↑</kbd> <kbd style={{ padding: '2px 5px', borderRadius: '3px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>↓</kbd> Navigate</span>
             <span><kbd style={{ padding: '2px 5px', borderRadius: '3px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>↵</kbd> Select</span>
+            <span><kbd style={{ padding: '2px 5px', borderRadius: '3px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>Ctrl+C</kbd> Copy Code</span>
             <span><kbd style={{ padding: '2px 5px', borderRadius: '3px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>Esc</kbd> Close</span>
           </div>
 
           <div>
-            Powered by <strong style={{ color: 'var(--text-main)' }}>uReact useDeferred &amp; useShortcut</strong>
+            Powered by <strong style={{ color: 'var(--text-main)' }}>uReact v2.1 Engine</strong>
           </div>
         </div>
+
+        {/* Floating Toast Notification */}
+        {toastMessage && (
+          <div className="palette-toast">
+            <Check size={14} />
+            <span>{toastMessage}</span>
+          </div>
+        )}
       </div>
     </div>
   );
