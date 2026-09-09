@@ -6,3 +6,4 @@ export * from './useDebounce';
 export * from './useEventListener';
 export * from './useShortcut';
 export * from './useInView';
+export * from './useQueryParam';

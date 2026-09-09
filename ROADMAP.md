@@ -30,18 +30,18 @@ v1.0.0 (Foundation) ──> v1.1.0 (Productivity) ──> v1.2.0 (Query & Cache)
 
 ---
 
-## 🚀 v1.2.0 — Global Query & Stale-While-Revalidate (SWR) *(Next Up)*
-*Goal: Eliminate external dependencies like TanStack Query / SWR for 95% of applications.*
+## ✅ v1.2.0 — Global Query & Stale-While-Revalidate (SWR) *(Released)*
+*Eliminates external dependencies like TanStack Query / SWR for 95% of applications.*
 
-- **`createQuery(key, fetcher, options)` / `useQuery`**:
-  - Global query deduplication (if 3 components request the same data, only 1 network call fires).
+- **`useQuery(key, fetcher, options)`**:
+  - Global query deduplication (multiple components requesting the same key share 1 network call).
   - Stale-While-Revalidate caching strategy with configurable `staleTime` and `cacheTime`.
   - Automatic background refetch on browser window focus and network reconnect.
 - **`useMutation`**:
   - Optimistic updates with automatic rollback on network failure.
-  - Automatic query cache invalidation (e.g., `invalidateQueries(['todos'])`).
-- **`createResource`**:
-  - React Suspense-compatible resource loaders.
+  - Automatic query cache invalidation (`invalidateQueries('key')`).
+- **`useQueryParam`**:
+  - Direct two-way reactive binding between component state and browser URL parameters.
 
 ---
 

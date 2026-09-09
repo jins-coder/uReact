@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   Package,
   History,
-  Keyboard
+  Keyboard,
+  Database
 } from 'lucide-react';
 import { useShortcut } from 'ureact';
 import { StateDemo } from './examples/StateDemo';
@@ -20,21 +21,23 @@ import { FormDemo } from './examples/FormDemo';
 import { AsyncDemo } from './examples/AsyncDemo';
 import { ControlFlowDemo } from './examples/ControlFlowDemo';
 import { HistoryDemo, canvasStore } from './examples/HistoryDemo';
+import { QueryDemo } from './examples/QueryDemo';
 import { ShortcutMenuModal } from './components/ShortcutMenuModal';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'underTheHood' | 'quickstart'>('state');
+  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'query' | 'underTheHood' | 'quickstart'>('state');
   const [isShortcutOpen, setIsShortcutOpen] = useState(false);
 
   // Global shortcut to toggle command palette
   useShortcut(['mod+k', 'ctrl+k'], () => setIsShortcutOpen((prev) => !prev), { preventDefault: true });
 
-  // Quick tab navigation numbers 1-5
+  // Quick tab navigation numbers 1-6
   useShortcut('1', () => setActiveTab('state'));
   useShortcut('2', () => setActiveTab('form'));
   useShortcut('3', () => setActiveTab('async'));
   useShortcut('4', () => setActiveTab('flow'));
   useShortcut('5', () => setActiveTab('history'));
+  useShortcut('6', () => setActiveTab('query'));
 
   return (
     <div>
@@ -74,7 +77,7 @@ export function App() {
               <Keyboard size={14} /> Shortcuts Menu (Ctrl+K)
             </button>
             <div className="pill" style={{ background: 'rgba(99, 102, 241, 0.15)', borderColor: 'rgba(99, 102, 241, 0.3)', color: '#c7d2fe' }}>
-              <Package size={14} /> v1.1.0
+              <Package size={14} /> v1.2.0
             </div>
             <div className="pill active">
               <Cpu size={14} /> Powered by React 18 Engine
@@ -152,6 +155,12 @@ export function App() {
             <History size={16} /> Time-Travel &amp; Shortcuts
           </button>
           <button
+            className={`tab-btn ${activeTab === 'query' ? 'active' : ''}`}
+            onClick={() => setActiveTab('query')}
+          >
+            <Database size={16} /> Global Query &amp; SWR
+          </button>
+          <button
             className={`tab-btn ${activeTab === 'underTheHood' ? 'active' : ''}`}
             onClick={() => setActiveTab('underTheHood')}
           >
@@ -172,6 +181,7 @@ export function App() {
           {activeTab === 'async' && <AsyncDemo />}
           {activeTab === 'flow' && <ControlFlowDemo />}
           {activeTab === 'history' && <HistoryDemo />}
+          {activeTab === 'query' && <QueryDemo />}
 
           {/* Under the Hood Deep Dive */}
           {activeTab === 'underTheHood' && (

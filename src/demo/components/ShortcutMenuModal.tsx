@@ -10,7 +10,8 @@ import {
   Zap,
   Layers,
   History,
-  CornerDownLeft
+  CornerDownLeft,
+  Database
 } from 'lucide-react';
 
 export interface ShortcutMenuModalProps {
@@ -117,6 +118,17 @@ export function ShortcutMenuModal({
       category: 'Navigation',
       action: () => {
         onSelectTab('history');
+        onClose();
+      }
+    },
+    {
+      id: 'tab-query',
+      title: 'Jump to Global Query & SWR Cache',
+      icon: <Database size={15} style={{ color: 'var(--accent-emerald)' }} />,
+      keys: ['6'],
+      category: 'Navigation',
+      action: () => {
+        onSelectTab('query');
         onClose();
       }
     }
