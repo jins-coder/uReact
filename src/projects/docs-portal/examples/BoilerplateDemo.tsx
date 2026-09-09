@@ -165,7 +165,7 @@ export const BoilerplateDemo = view(() => {
       </div>
 
       {/* 3-Tier Line-by-Line Code Comparison */}
-      <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px', marginBottom: '36px' }}>
+      <div id="side-by-side" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px', marginBottom: '32px' }}>
         {/* Tier 1: Standard React */}
         <TorchCode
           title="Standard React (65 lines)"
@@ -258,7 +258,7 @@ export const UserView = view(() => (
       </div>
 
       {/* Interactive Playgrounds Grid */}
-      <div id="live-demo" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px' }}>
+      <div id="live-demo" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px' }}>
         
         {/* Widget 1: Direct Proxy $bind & $toggle */}
         <div className="widget-card">
