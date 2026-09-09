@@ -117,6 +117,10 @@ Despite React's dominance, developers across the community have spent the last d
   - Live Store & Signal Inspector with JSON tree exploration.
   - Real-time mutation timeline log with timestamps and rollback telemetry.
   - Reactivity metrics and subscriber health stats.
+- [x] **Official VS Code Developer Extension (`vscode-ureact`)**:
+  - Full autocomplete snippets catalog (`ursignal`, `urcomputed`, `urstore`, `urform`, `urscoped`, `urwatch`, `uraction`, `urdevtools`, etc.).
+  - Rich IntelliSense hover documentation with side-by-side React comparisons.
+  - Interactive Command Palette actions and status bar quick-launch menu (`⚡ uReact v2.3`).
 - [x] **Dedicated Documentation & Interactive Demos**:
   - New `/docs/dev-features` page detailing all 4 developer-requested capabilities with live interactive previews.
   - Scoped CSS & Form Store preset added to `/docs/playground`.

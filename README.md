@@ -135,6 +135,21 @@ Visit `http://localhost:3000` to interact with the live documentation portal, li
 
 ---
 
+## 💻 VS Code Extension
+
+Supercharge your development speed with the official **[uReact VS Code Extension](vscode-extension/)**:
+- **Autocomplete Snippets**: `ursignal`, `urcomputed`, `urstore`, `urform`, `urscoped`, `urwatch`, `uraction`, `urdevtools`, and more.
+- **IntelliSense Hover Tooltips**: Instant Markdown docs, parameter types, and "Why it's better than standard React" comparisons directly when hovering over any uReact keyword.
+- **Status Bar Integration**: Click `⚡ uReact v2.3` in your bottom status bar for 1-click scaffolding and quick actions.
+- **Interactive Commands**: Insert production-ready reactive store templates, validation schemas, or `<Scoped>` CSS wrappers in one click.
+
+```bash
+# Build the extension
+npm run build:ext
+```
+
+---
+
 ## 📜 License
 
 
