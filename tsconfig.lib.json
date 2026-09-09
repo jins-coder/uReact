@@ -14,10 +14,6 @@
   },
   "include": [
     "src/index.ts",
-    "src/core/**/*",
-    "src/hooks/**/*",
-    "src/components/**/*",
-    "src/query/**/*",
-    "src/actions/**/*"
+    "src/system/**/*"
   ]
 }

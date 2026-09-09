@@ -17,7 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "ureact": ["./src/index.ts"]
+      "ureact": ["./src/system/index.ts", "./src/index.ts"]
     }
   },
   "include": ["src"]
