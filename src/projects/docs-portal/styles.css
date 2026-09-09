@@ -309,6 +309,7 @@ pre::-webkit-scrollbar-thumb:hover,
   letter-spacing: -0.03em;
   background: linear-gradient(135deg, var(--text-main) 30%, var(--text-dim) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -380,6 +381,7 @@ pre::-webkit-scrollbar-thumb:hover,
 .hero-title .highlight {
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -945,6 +947,7 @@ pre::-webkit-scrollbar-thumb:hover,
   margin-bottom: 16px;
   background: linear-gradient(135deg, var(--text-main) 40%, var(--accent-cyan));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
