@@ -96,7 +96,7 @@ export function ShortcutMenuModal({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(3, 7, 18, 0.8)',
+        backgroundColor: 'rgba(15, 23, 42, 0.65)',
         backdropFilter: 'blur(8px)',
         zIndex: 9999,
         display: 'flex',
@@ -110,10 +110,10 @@ export function ShortcutMenuModal({
         style={{
           width: '100%',
           maxWidth: '580px',
-          backgroundColor: '#0d121d',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: '16px',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(56, 189, 248, 0.15)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.25), 0 0 30px var(--accent-cyan-bg)',
           overflow: 'hidden'
         }}
         onClick={(e) => e.stopPropagation()}
@@ -122,8 +122,8 @@ export function ShortcutMenuModal({
         <div
           style={{
             padding: '16px 20px',
-            borderBottom: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
-            background: 'rgba(255, 255, 255, 0.02)'
+            borderBottom: '1px solid var(--border-subtle)',
+            background: 'var(--bg-secondary)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -133,8 +133,9 @@ export function ShortcutMenuModal({
                   width: '32px',
                   height: '32px',
                   borderRadius: '8px',
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  color: 'var(--accent-cyan, #38bdf8)',
+                  background: 'var(--accent-cyan-bg)',
+                  color: 'var(--accent-cyan)',
+                  border: '1px solid var(--border-subtle)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -143,10 +144,10 @@ export function ShortcutMenuModal({
                 <Keyboard size={18} />
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-main, #f8fafc)' }}>
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>
                   React.dev Search &amp; Palette
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted, #94a3b8)' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                   Search 100% of React &amp; uReact documentation, or run commands
                 </div>
               </div>
@@ -159,9 +160,10 @@ export function ShortcutMenuModal({
                 borderRadius: '6px',
                 background: 'transparent',
                 border: 'none',
-                color: 'var(--text-muted, #94a3b8)',
+                color: 'var(--text-muted)',
                 cursor: 'pointer'
               }}
+              title="Close (Esc)"
             >
               <X size={18} />
             </button>
@@ -174,7 +176,7 @@ export function ShortcutMenuModal({
               alignItems: 'center'
             }}
           >
-            <Search size={16} style={{ position: 'absolute', left: '12px', color: 'var(--text-dim, #64748b)' }} />
+            <Search size={16} style={{ position: 'absolute', left: '12px', color: 'var(--text-dim)' }} />
             <input
               type="text"
               value={searchTerm}
@@ -184,26 +186,35 @@ export function ShortcutMenuModal({
               style={{
                 width: '100%',
                 padding: '10px 12px 10px 38px',
-                background: 'rgba(0, 0, 0, 0.35)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
+                background: 'var(--bg-primary)',
+                border: '1.5px solid var(--border-subtle)',
                 borderRadius: '10px',
-                color: 'var(--text-main, #f8fafc)',
+                color: 'var(--text-main)',
                 fontSize: '0.9rem',
-                outline: 'none'
+                outline: 'none',
+                transition: 'border-color 0.2s, box-shadow 0.2s'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--accent-cyan)';
+                e.target.style.boxShadow = '0 0 0 3px var(--accent-cyan-bg)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--border-subtle)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>
         </div>
 
         {/* Action / Doc Items List */}
-        <div style={{ padding: '12px 14px', maxHeight: '420px', overflowY: 'auto' }}>
+        <div style={{ padding: '12px 14px', maxHeight: '420px', overflowY: 'auto', background: 'var(--bg-card)' }}>
           {/* Docs Section */}
           <div style={{ marginBottom: '14px' }}>
             <div
               style={{
                 fontSize: '0.72rem',
                 fontWeight: 700,
-                color: 'var(--text-dim, #64748b)',
+                color: 'var(--text-dim)',
                 letterSpacing: '0.05em',
                 padding: '4px 8px 8px',
                 textTransform: 'uppercase'
@@ -224,29 +235,29 @@ export function ShortcutMenuModal({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '9px 12px',
+                    padding: '10px 14px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.1)';
-                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-cyan-bg)';
+                    e.currentTarget.style.borderColor = 'var(--accent-cyan)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.04)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <BookOpen size={15} style={{ color: 'var(--accent-cyan, #38bdf8)' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <BookOpen size={16} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
                     <div>
-                      <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main, #f8fafc)' }}>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main)' }}>
                         {item.title}
                       </div>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted, #94a3b8)' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                         {item.description}
                       </div>
                     </div>
@@ -256,21 +267,28 @@ export function ShortcutMenuModal({
                     <span
                       style={{
                         fontSize: '0.68rem',
-                        padding: '2px 6px',
+                        padding: '2px 8px',
                         borderRadius: '4px',
                         fontWeight: 700,
+                        whiteSpace: 'nowrap',
                         background:
                           item.badgeType === 'react19'
-                            ? 'rgba(245, 158, 11, 0.2)'
+                            ? 'var(--callout-react19-bg)'
                             : item.badgeType === 'reduction'
-                            ? 'rgba(16, 185, 129, 0.2)'
-                            : 'rgba(56, 189, 248, 0.15)',
+                            ? 'var(--callout-tip-bg)'
+                            : 'var(--accent-cyan-bg)',
                         color:
                           item.badgeType === 'react19'
-                            ? '#fbbf24'
+                            ? 'var(--accent-amber)'
                             : item.badgeType === 'reduction'
-                            ? '#34d399'
-                            : '#38bdf8'
+                            ? 'var(--accent-emerald)'
+                            : 'var(--accent-cyan)',
+                        border:
+                          item.badgeType === 'react19'
+                            ? '1px solid rgba(217, 119, 6, 0.3)'
+                            : item.badgeType === 'reduction'
+                            ? '1px solid rgba(5, 150, 105, 0.3)'
+                            : '1px solid var(--border-subtle)'
                       }}
                     >
                       {item.badge}
@@ -288,7 +306,7 @@ export function ShortcutMenuModal({
                 style={{
                   fontSize: '0.72rem',
                   fontWeight: 700,
-                  color: 'var(--text-dim, #64748b)',
+                  color: 'var(--text-dim)',
                   letterSpacing: '0.05em',
                   padding: '4px 8px 8px',
                   textTransform: 'uppercase'
@@ -310,15 +328,28 @@ export function ShortcutMenuModal({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '8px 12px',
+                      padding: '9px 14px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid rgba(255, 255, 255, 0.04)',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-subtle)',
                       cursor: action.disabled ? 'not-allowed' : 'pointer',
-                      opacity: action.disabled ? 0.4 : 1
+                      opacity: action.disabled ? 0.45 : 1,
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!action.disabled) {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                        e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!action.disabled) {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                      }
                     }}
                   >
-                    <span style={{ fontSize: '0.84rem', color: 'var(--text-main, #f8fafc)' }}>
+                    <span style={{ fontSize: '0.84rem', color: 'var(--text-main)', fontWeight: 500 }}>
                       {action.title}
                     </span>
                     <div style={{ display: 'flex', gap: '4px' }}>
@@ -326,13 +357,14 @@ export function ShortcutMenuModal({
                         <kbd
                           key={k}
                           style={{
-                            padding: '2px 6px',
-                            background: 'rgba(255, 255, 255, 0.08)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            padding: '2px 7px',
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '4px',
-                            fontSize: '0.7rem',
+                            fontSize: '0.72rem',
                             fontFamily: 'var(--font-mono)',
-                            color: 'var(--accent-cyan, #38bdf8)'
+                            color: 'var(--accent-cyan)',
+                            fontWeight: 600
                           }}
                         >
                           {k}
@@ -350,17 +382,17 @@ export function ShortcutMenuModal({
         <div
           style={{
             padding: '10px 18px',
-            borderTop: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
-            background: 'rgba(0, 0, 0, 0.2)',
+            borderTop: '1px solid var(--border-subtle)',
+            background: 'var(--bg-secondary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             fontSize: '0.75rem',
-            color: 'var(--text-dim, #64748b)'
+            color: 'var(--text-muted)'
           }}
         >
-          <span>Tip: Press <kbd style={{ padding: '1px 5px', borderRadius: '3px', background: 'rgba(255,255,255,0.1)' }}>Esc</kbd> anytime to dismiss</span>
-          <span>Powered by <strong>uReact useShortcut</strong></span>
+          <span>Tip: Press <kbd style={{ padding: '2px 6px', borderRadius: '4px', background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>Esc</kbd> anytime to dismiss</span>
+          <span>Powered by <strong style={{ color: 'var(--text-main)' }}>uReact useShortcut</strong></span>
         </div>
       </div>
     </div>
