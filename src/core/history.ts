@@ -1,6 +1,14 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useRef, useCallback } from 'react';
 import { createStore } from './state';
 import { Store, Unsubscribe, Listener } from './types';
+
+export interface HistorySnapshot<T> {
+  canUndo: boolean;
+  canRedo: boolean;
+  length: number;
+  pointer: number;
+  version: number;
+}
 
 export interface HistoryStore<T extends object> {
   state: T;
@@ -11,10 +19,12 @@ export interface HistoryStore<T extends object> {
   history: T[];
   reset: () => void;
   subscribe: (listener: Listener) => Unsubscribe;
-  getSnapshot: () => { canUndo: boolean; canRedo: boolean; length: number; pointer: number };
+  getSnapshot: () => HistorySnapshot<T>;
+  getBaseStore: () => Store<T>;
 }
 
 function clone<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') return obj;
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -29,12 +39,29 @@ export function createHistoryStore<T extends object>(
   const initialSnapshot = clone(initialState);
   let past: T[] = [clone(initialState)];
   let pointer = 0;
+  let version = 0;
   let isInternalChange = false;
 
   const baseStore = createStore(initialState);
   const listeners = new Set<Listener>();
 
-  function notify() {
+  let cachedSnapshot: HistorySnapshot<T> = {
+    canUndo: false,
+    canRedo: false,
+    length: 1,
+    pointer: 0,
+    version: 0
+  };
+
+  function updateHistorySnapshot() {
+    version++;
+    cachedSnapshot = {
+      canUndo: pointer > 0,
+      canRedo: pointer < past.length - 1,
+      length: past.length,
+      pointer,
+      version
+    };
     listeners.forEach((l) => l());
   }
 
@@ -51,10 +78,10 @@ export function createHistoryStore<T extends object>(
     if (past.length > maxHistory) {
       past.shift();
     } else {
-      pointer++;
+      pointer = past.length - 1;
     }
 
-    notify();
+    updateHistorySnapshot();
   });
 
   return {
@@ -65,10 +92,9 @@ export function createHistoryStore<T extends object>(
       if (pointer > 0) {
         pointer--;
         isInternalChange = true;
-        const target = clone(past[pointer]);
-        Object.assign(baseStore.state, target);
+        baseStore.replace(clone(past[pointer]));
         isInternalChange = false;
-        notify();
+        updateHistorySnapshot();
         return true;
       }
       return false;
@@ -77,10 +103,9 @@ export function createHistoryStore<T extends object>(
       if (pointer < past.length - 1) {
         pointer++;
         isInternalChange = true;
-        const target = clone(past[pointer]);
-        Object.assign(baseStore.state, target);
+        baseStore.replace(clone(past[pointer]));
         isInternalChange = false;
-        notify();
+        updateHistorySnapshot();
         return true;
       }
       return false;
@@ -100,23 +125,21 @@ export function createHistoryStore<T extends object>(
       isInternalChange = true;
       baseStore.reset();
       isInternalChange = false;
-      notify();
+      updateHistorySnapshot();
     },
     subscribe(listener: Listener) {
-      const unsub1 = baseStore.subscribe(listener);
       listeners.add(listener);
+      const unsubBase = baseStore.subscribe(listener);
       return () => {
-        unsub1();
         listeners.delete(listener);
+        unsubBase();
       };
     },
     getSnapshot() {
-      return {
-        canUndo: pointer > 0,
-        canRedo: pointer < past.length - 1,
-        length: past.length,
-        pointer
-      };
+      return cachedSnapshot;
+    },
+    getBaseStore() {
+      return baseStore;
     }
   };
 }
@@ -125,19 +148,29 @@ export function createHistoryStore<T extends object>(
  * Hook to consume a time-travel history store
  */
 export function useHistoryStore<T extends object>(historyStore: HistoryStore<T>) {
-  useSyncExternalStore(
+  // Subscribe to history metadata (canUndo, canRedo, pointer, version)
+  const meta = useSyncExternalStore(
     historyStore.subscribe,
     historyStore.getSnapshot,
     historyStore.getSnapshot
+  );
+
+  // Subscribe to state snapshot
+  const baseStore = historyStore.getBaseStore();
+  useSyncExternalStore(
+    baseStore.subscribe,
+    baseStore.getSnapshot,
+    baseStore.getSnapshot
   );
 
   return {
     state: historyStore.state,
     undo: historyStore.undo,
     redo: historyStore.redo,
-    canUndo: historyStore.canUndo,
-    canRedo: historyStore.canRedo,
+    canUndo: meta.canUndo,
+    canRedo: meta.canRedo,
     history: historyStore.history,
+    pointer: meta.pointer,
     reset: historyStore.reset
   };
 }

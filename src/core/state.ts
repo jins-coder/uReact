@@ -103,6 +103,20 @@ export function createStore<T extends object>(initialState: T): Store<T> {
 
   const proxyState = createDeepProxy(rawState);
 
+  function applyStateInPlace(target: any, source: any) {
+    if (Array.isArray(target) && Array.isArray(source)) {
+      target.length = 0;
+      target.push(...cloneDeep(source));
+    } else {
+      for (const key of Object.keys(target)) {
+        if (!(key in source)) {
+          delete target[key];
+        }
+      }
+      Object.assign(target, cloneDeep(source));
+    }
+  }
+
   return {
     get state() {
       return proxyState;
@@ -115,7 +129,11 @@ export function createStore<T extends object>(initialState: T): Store<T> {
       return snapshot;
     },
     reset() {
-      rawState = cloneDeep(initialClone);
+      applyStateInPlace(rawState, initialClone);
+      updateSnapshot();
+    },
+    replace(newState: T) {
+      applyStateInPlace(rawState, newState);
       updateSnapshot();
     },
     batch(fn: () => void) {

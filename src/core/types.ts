@@ -6,6 +6,8 @@ export interface Store<T extends object> {
   subscribe: (listener: Listener) => Unsubscribe;
   getSnapshot: () => T;
   reset: () => void;
+  /** Replace the entire state in-place with a new state object */
+  replace: (newState: T) => void;
   /** Batch multiple mutations to trigger only one re-render */
   batch: (fn: () => void) => void;
 }

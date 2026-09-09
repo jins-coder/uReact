@@ -11,16 +11,30 @@ import {
   ExternalLink,
   ShieldCheck,
   Package,
-  History
+  History,
+  Keyboard
 } from 'lucide-react';
+import { useShortcut } from 'ureact';
 import { StateDemo } from './examples/StateDemo';
 import { FormDemo } from './examples/FormDemo';
 import { AsyncDemo } from './examples/AsyncDemo';
 import { ControlFlowDemo } from './examples/ControlFlowDemo';
-import { HistoryDemo } from './examples/HistoryDemo';
+import { HistoryDemo, canvasStore } from './examples/HistoryDemo';
+import { ShortcutMenuModal } from './components/ShortcutMenuModal';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'underTheHood' | 'quickstart'>('state');
+  const [isShortcutOpen, setIsShortcutOpen] = useState(false);
+
+  // Global shortcut to toggle command palette
+  useShortcut(['mod+k', 'ctrl+k'], () => setIsShortcutOpen((prev) => !prev), { preventDefault: true });
+
+  // Quick tab navigation numbers 1-5
+  useShortcut('1', () => setActiveTab('state'));
+  useShortcut('2', () => setActiveTab('form'));
+  useShortcut('3', () => setActiveTab('async'));
+  useShortcut('4', () => setActiveTab('flow'));
+  useShortcut('5', () => setActiveTab('history'));
 
   return (
     <div>
@@ -44,14 +58,26 @@ export function App() {
           </div>
 
           <div className="header-badges">
+            <button
+              onClick={() => setIsShortcutOpen(true)}
+              className="btn btn-secondary"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8rem',
+                gap: '8px',
+                background: 'rgba(56, 189, 248, 0.12)',
+                borderColor: 'rgba(56, 189, 248, 0.3)',
+                color: 'var(--accent-cyan)'
+              }}
+              title="Click or press Ctrl+K to open shortcuts menu"
+            >
+              <Keyboard size={14} /> Shortcuts Menu (Ctrl+K)
+            </button>
             <div className="pill" style={{ background: 'rgba(99, 102, 241, 0.15)', borderColor: 'rgba(99, 102, 241, 0.3)', color: '#c7d2fe' }}>
               <Package size={14} /> v1.1.0
             </div>
             <div className="pill active">
               <Cpu size={14} /> Powered by React 18 Engine
-            </div>
-            <div className="pill">
-              <ShieldCheck size={14} /> Zero Hook Ceremony
             </div>
           </div>
         </header>
@@ -292,6 +318,17 @@ export default function App() {
           </p>
         </footer>
       </div>
+
+      {/* Shortcuts Command Palette Modal */}
+      <ShortcutMenuModal
+        isOpen={isShortcutOpen}
+        onClose={() => setIsShortcutOpen(false)}
+        onSelectTab={setActiveTab}
+        onUndo={() => canvasStore.undo()}
+        onRedo={() => canvasStore.redo()}
+        canUndo={canvasStore.canUndo}
+        canRedo={canvasStore.canRedo}
+      />
     </div>
   );
 }
