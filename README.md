@@ -1,4 +1,4 @@
-# uReact (v1.0.0) ⚛️🚀
+# uReact (v1.1.0) ⚛️🚀
 
 > **The Developer-First Framework Built on Top of React.**  
 > React under the hood. Pure velocity and joy on top.
@@ -17,9 +17,11 @@ Standard React requires writing significant boilerplate and navigating tricky ho
 
 **uReact** solves this by providing:
 1. **Proxy Reactive Stores (`createStore`, `useStore`)**: Direct mutable syntax (`state.user.name = 'Bob'`, `state.cart.push(item)`) rendered cleanly via React's native `useSyncExternalStore`.
-2. **Two-Way Form Binding (`useForm`)**: One-line field binding (`form.bind('email')`) with automatic validation, touched tracking, and submit handling.
-3. **Zero-Ceremony Async (`useAsync`, `<Await>`)**: Single-line async runner with loading, error states, automatic unmount protection, race-condition safety, and optimistic mutations.
-4. **Declarative Control Flow (`<Show>`, `<For>`, `<Switch>`)**: Clean, readable conditional and list rendering without nested ternaries or manual `.map()` empty checks.
+2. **Time-Travel Stores (`createHistoryStore`, `useHistoryStore`)**: Undo/redo history timeline with zero configuration.
+3. **Two-Way Form Binding (`useForm`)**: One-line field binding (`form.bind('email')`) with automatic validation, touched tracking, and submit handling.
+4. **Zero-Ceremony Async (`useAsync`, `<Await>`)**: Single-line async runner with loading, error states, automatic unmount protection, race-condition safety, and optimistic mutations.
+5. **Declarative Control Flow (`<Show>`, `<For>`, `<Switch>`)**: Clean, readable conditional and list rendering without nested ternaries or manual `.map()` empty checks.
+6. **Ergonomic Utilities**: `useShortcut`, `useInView`, `useDebounce`, `useToggle`, `useLocalStorage`, `useEventListener`.
 
 ---
 

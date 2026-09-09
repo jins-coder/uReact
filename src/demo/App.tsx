@@ -10,15 +10,17 @@ import {
   CheckCircle,
   ExternalLink,
   ShieldCheck,
-  Package
+  Package,
+  History
 } from 'lucide-react';
 import { StateDemo } from './examples/StateDemo';
 import { FormDemo } from './examples/FormDemo';
 import { AsyncDemo } from './examples/AsyncDemo';
 import { ControlFlowDemo } from './examples/ControlFlowDemo';
+import { HistoryDemo } from './examples/HistoryDemo';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'underTheHood' | 'quickstart'>('state');
+  const [activeTab, setActiveTab] = useState<'state' | 'form' | 'async' | 'flow' | 'history' | 'underTheHood' | 'quickstart'>('state');
 
   return (
     <div>
@@ -43,7 +45,7 @@ export function App() {
 
           <div className="header-badges">
             <div className="pill" style={{ background: 'rgba(99, 102, 241, 0.15)', borderColor: 'rgba(99, 102, 241, 0.3)', color: '#c7d2fe' }}>
-              <Package size={14} /> v1.0.0
+              <Package size={14} /> v1.1.0
             </div>
             <div className="pill active">
               <Cpu size={14} /> Powered by React 18 Engine
@@ -118,6 +120,12 @@ export function App() {
             <Layers size={16} /> Control Flow (&lt;Show&gt;, &lt;For&gt;)
           </button>
           <button
+            className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            <History size={16} /> Time-Travel &amp; Shortcuts
+          </button>
+          <button
             className={`tab-btn ${activeTab === 'underTheHood' ? 'active' : ''}`}
             onClick={() => setActiveTab('underTheHood')}
           >
@@ -137,6 +145,7 @@ export function App() {
           {activeTab === 'form' && <FormDemo />}
           {activeTab === 'async' && <AsyncDemo />}
           {activeTab === 'flow' && <ControlFlowDemo />}
+          {activeTab === 'history' && <HistoryDemo />}
 
           {/* Under the Hood Deep Dive */}
           {activeTab === 'underTheHood' && (
