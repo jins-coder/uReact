@@ -236,6 +236,8 @@ export function App() {
         onRedo={() => canvasStore.redo()}
         canUndo={canvasStore.canUndo}
         canRedo={canvasStore.canRedo}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
     </div>
   );

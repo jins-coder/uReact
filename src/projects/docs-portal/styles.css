@@ -780,6 +780,117 @@ pre::-webkit-scrollbar-thumb:hover,
   padding: 20px;
 }
 
+/* ==========================================================================
+   Raycast / Algolia Style Command Palette Modal
+   ========================================================================== */
+
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: paletteFadeIn 0.15s ease-out;
+}
+
+@keyframes paletteFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.palette-container {
+  width: 100%;
+  max-width: 820px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 40px var(--accent-cyan-bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: paletteScaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes paletteScaleIn {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.palette-split-view {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: 420px;
+  max-height: 480px;
+}
+
+@media (max-width: 768px) {
+  .palette-split-view {
+    grid-template-columns: 1fr;
+  }
+  .palette-preview-pane {
+    display: none !important;
+  }
+}
+
+.palette-list-pane {
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+.palette-preview-pane {
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.1s, border-color 0.1s;
+}
+
+.palette-item:hover,
+.palette-item.selected {
+  background-color: var(--accent-cyan-bg);
+  border-color: var(--accent-cyan);
+}
+
+.palette-tag-chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  transition: all 0.12s ease;
+}
+
+.palette-tag-chip:hover {
+  color: var(--text-main);
+  background: var(--bg-card-hover);
+}
+
+.palette-tag-chip.active {
+  background: var(--accent-cyan-bg);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
 /* Code Comparison Layout */
 .comparison-grid {
   display: grid;
