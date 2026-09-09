@@ -183,6 +183,7 @@ pre,
   background-color: var(--scrollbar-thumb) !important;
   border-radius: 9999px !important;
   border: 2px solid transparent !important;
+  -webkit-background-clip: content-box !important;
   background-clip: content-box !important;
   transition: background-color 0.2s ease;
 }
@@ -951,7 +952,10 @@ pre::-webkit-scrollbar-thumb:hover,
   letter-spacing: -0.03em;
   line-height: 1.2;
   margin-bottom: 16px;
-  color: var(--text-main);
+  background: linear-gradient(135deg, var(--text-main) 60%, var(--accent-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .doc-lead {
