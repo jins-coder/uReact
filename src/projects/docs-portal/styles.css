@@ -489,18 +489,18 @@ pre::-webkit-scrollbar-thumb:hover,
 .panel-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
 }
 
 .panel-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin: 0;
 }
 
 .panel-subtitle {
@@ -509,19 +509,189 @@ pre::-webkit-scrollbar-thumb:hover,
   margin-top: 4px;
 }
 
+/* ==========================================================================
+   React 19 Interactive Sandbox Shell (react.dev style)
+   ========================================================================== */
+
+.sandbox-shell {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  margin-bottom: 28px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="dark"] .sandbox-shell {
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+}
+
+.sandbox-header {
+  padding: 20px 24px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sandbox-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.sandbox-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-cyan-bg);
+  color: var(--accent-cyan);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.sandbox-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sandbox-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.sandbox-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sandbox-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-cyan);
+}
+
+.sandbox-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--accent-emerald);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.sandbox-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: sandboxPulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes sandboxPulse {
+  to {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+.sandbox-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.sandbox-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sandbox-tab:hover {
+  color: var(--text-main);
+  background: var(--bg-secondary);
+}
+
+.sandbox-tab.active {
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-bg);
+  border-color: var(--border-subtle);
+}
+
+.sandbox-content {
+  padding: 24px;
+}
+
 /* Widget Card */
 .widget-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 22px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.widget-card:hover {
+  border-color: var(--border-focus);
+}
+
+.widget-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .widget-title {
   font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 8px;
+  color: var(--text-main);
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
