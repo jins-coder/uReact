@@ -1,6 +1,7 @@
 import { useSyncExternalStore, useRef, useCallback, useEffect } from 'react';
 import { Listener, Store, Signal, Unsubscribe } from './types';
 import { trackStoreAccess, notifyTrackedStores } from './view';
+import { bind } from './bind';
 
 // Track active batching
 let isBatching = false;
@@ -120,7 +121,7 @@ export function createStore<T extends object>(initialState: T): Store<T> {
     }
   }
 
-  return {
+  const storeInstance: Store<T> = {
     get state() {
       return proxyState;
     },
@@ -150,8 +151,25 @@ export function createStore<T extends object>(initialState: T): Store<T> {
           notifyBatch();
         }
       }
+    },
+    get $bind() {
+      return new Proxy(
+        ((prop: any) => bind(storeInstance, prop)) as any,
+        {
+          get(_target, prop: string | symbol) {
+            if (typeof prop === 'string') {
+              return bind(storeInstance, prop as any);
+            }
+          }
+        }
+      );
+    },
+    $toggle(prop: keyof T) {
+      (proxyState as any)[prop] = !(proxyState as any)[prop];
     }
   };
+
+  return storeInstance;
 }
 
 /**

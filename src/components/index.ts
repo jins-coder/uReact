@@ -5,3 +5,5 @@ export * from './Await';
 export * from './Head';
 export * from './When';
 export * from './Fetch';
+export * from './AutoForm';
+export * from './ActionForm';

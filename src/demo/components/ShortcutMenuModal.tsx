@@ -146,7 +146,7 @@ export function ShortcutMenuModal({
     },
     {
       id: 'tab-reduction',
-      title: 'Jump to Code Reducer (-79%)',
+      title: 'Jump to Code Reducer (-89%)',
       icon: <Minimize2 size={15} style={{ color: 'var(--accent-emerald)' }} />,
       keys: ['8'],
       category: 'Navigation',

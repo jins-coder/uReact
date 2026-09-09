@@ -1,6 +1,17 @@
 export type Listener = () => void;
 export type Unsubscribe = () => void;
 
+export interface AutoBinding {
+  name: string;
+  value?: any;
+  checked?: boolean;
+  onChange: (e: any) => void;
+}
+
+export type StoreBindingProxy<T> = {
+  [K in keyof T]: AutoBinding;
+} & (<K extends keyof T>(prop: K) => AutoBinding);
+
 export interface Store<T extends object> {
   state: T;
   subscribe: (listener: Listener) => Unsubscribe;
@@ -10,6 +21,10 @@ export interface Store<T extends object> {
   replace: (newState: T) => void;
   /** Batch multiple mutations to trigger only one re-render */
   batch: (fn: () => void) => void;
+  /** Direct two-way binding proxy: store.$bind.property or store.$bind('property') */
+  $bind: StoreBindingProxy<T>;
+  /** Toggle a boolean property in-place */
+  $toggle: (property: keyof T) => void;
 }
 
 export interface Signal<T> {

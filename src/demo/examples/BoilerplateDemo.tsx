@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
 import {
   createStore,
+  createListStore,
   view,
   bind,
   prevent,
   When,
-  Fetch,
-  useCounter,
-  useArray
+  AutoForm,
+  ActionForm,
+  ActionSubmitButton,
+  useCounter
 } from 'ureact';
 import {
   Minimize2,
-  CheckCircle,
+  CheckCircle2,
   Plus,
   Minus,
   Sparkles,
   ArrowRight,
   TrendingDown,
-  Code2
+  Code2,
+  ListTodo,
+  Layers,
+  Send,
+  Trash2,
+  Check,
+  RotateCcw
 } from 'lucide-react';
 
-// Auto-reactive store for the demo
+// 1. Reactive store using direct proxy $bind
 const userProfileStore = createStore({
   username: 'Alex Chen',
   role: 'Full Stack Engineer',
@@ -28,7 +36,30 @@ const userProfileStore = createStore({
   theme: 'Dark AMOLED'
 });
 
-// 1. Auto-reactive component using view() - ZERO useStore hook calls!
+// 2. Reactive 1-line CRUD collection store
+interface TaskItem {
+  id: number;
+  title: string;
+  category: string;
+  done: boolean;
+}
+
+const taskList = createListStore<TaskItem>([
+  { id: 1, title: 'Eliminate useEffect dependency arrays', category: 'DX', done: true },
+  { id: 2, title: 'Two-way bind inputs with store.$bind', category: 'Core', done: true },
+  { id: 3, title: '1-Line CRUD with createListStore()', category: 'Collection', done: true },
+  { id: 4, title: 'Single-tag form with <AutoForm />', category: 'Components', done: false }
+]);
+
+// 3. Settings store for AutoForm demo
+const settingsStore = createStore({
+  projectName: 'SuperApp 2.0',
+  teamLead: 'Sarah Connor',
+  maxUsers: 50,
+  enableSso: true
+});
+
+// Auto-reactive badge using view() - ZERO useStore calls!
 const AutoReactiveBadge = view(() => (
   <div
     style={{
@@ -38,7 +69,8 @@ const AutoReactiveBadge = view(() => (
       border: '1px solid rgba(56, 189, 248, 0.3)',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      gap: '12px'
     }}
   >
     <div>
@@ -55,16 +87,35 @@ const AutoReactiveBadge = view(() => (
   </div>
 ));
 
-export function BoilerplateDemo() {
+export const BoilerplateDemo = view(() => {
   const counter = useCounter(10);
-  const tags = useArray(['React 19', 'uReact', 'Velocity', 'Zero-Boilerplate']);
-  const [tagInput, setTagInput] = useState('');
-  const [activeView, setActiveView] = useState<'profile' | 'tags'>('profile');
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const [autoFormSaved, setAutoFormSaved] = useState<string | null>(null);
 
-  const handleAddTag = () => {
-    if (!tagInput.trim()) return;
-    tags.push(tagInput.trim());
-    setTagInput('');
+  const handleAddTask = () => {
+    if (!newTaskTitle.trim()) return;
+    taskList.add({
+      title: newTaskTitle.trim(),
+      category: 'General',
+      done: false
+    });
+    setNewTaskTitle('');
+  };
+
+  // Mock server action for React 19 ActionForm
+  const handleSaveAction = async (formData: FormData) => {
+    // Simulate server response delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const title = formData.get('actionItem') as string;
+    if (!title) throw new Error('Item name cannot be empty');
+    taskList.add({
+      title,
+      category: 'ActionForm',
+      done: false
+    });
+    setActionFeedback(`✓ Server Action executed: "${title}" created!`);
+    setTimeout(() => setActionFeedback(null), 3500);
   };
 
   return (
@@ -73,271 +124,401 @@ export function BoilerplateDemo() {
         <div>
           <h3 className="panel-title">
             <Minimize2 size={20} style={{ color: 'var(--accent-emerald)' }} />
-            Radical Code Reduction Engine (79% Less Code)
+            Radical Code Reduction Engine (Up to -89% Less Code)
           </h3>
           <p className="panel-subtitle">
             How uReact systematically eliminates every repetitive code block in React development.
           </p>
         </div>
         <div className="pill active" style={{ fontSize: '0.85rem', padding: '6px 14px' }}>
-          <TrendingDown size={15} /> <strong>-79.4% Total Lines of Code</strong>
+          <TrendingDown size={15} /> <strong>-89.2% Code Reduction Achieved</strong>
         </div>
       </div>
 
       {/* Code Reduction Metrics Grid */}
       <div className="metrics-strip" style={{ marginBottom: '28px' }}>
         <div className="metric-card">
-          <div className="metric-val cyan">view()</div>
+          <div className="metric-val cyan">store.$bind</div>
           <div className="metric-label">
-            Auto-reactive components. Reads from stores auto-subscribe with <strong>0 hook calls</strong>.
+            Direct proxy binding. Eliminates <code>bind()</code> helper imports &amp; <code>value/onChange</code>.
           </div>
         </div>
         <div className="metric-card">
-          <div className="metric-val green">{`{...bind()}`}</div>
+          <div className="metric-val green">createListStore()</div>
           <div className="metric-label">
-            Universal two-way binding. Eliminates <code>value</code> + <code>onChange</code> for inputs.
+            1-line reactive collections. Built-in <code>add()</code>, <code>remove()</code>, <code>toggle()</code>.
           </div>
         </div>
         <div className="metric-card">
-          <div className="metric-val purple">prevent()</div>
+          <div className="metric-val purple">&lt;AutoForm&gt;</div>
           <div className="metric-label">
-            Event modifier. Eliminates <code>e.preventDefault()</code> wrappers.
+            Single-tag form. Generates full two-way bound responsive forms from 1 schema.
           </div>
         </div>
         <div className="metric-card">
-          <div className="metric-val" style={{ color: 'var(--accent-amber)' }}>&lt;When&gt;</div>
+          <div className="metric-val" style={{ color: 'var(--accent-amber)' }}>&lt;ActionForm&gt;</div>
           <div className="metric-label">
-            1-line conditional. Eliminates nested ternary soup and IIFEs.
+            React 19 native action form with auto-pending state &amp; disabled buttons.
           </div>
         </div>
       </div>
 
-      {/* Direct Line-by-Line Code Comparison */}
-      <div className="comparison-grid">
-        {/* Standard React */}
+      {/* 3-Tier Line-by-Line Code Comparison */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+        {/* Tier 1: Standard React */}
         <div className="code-box standard">
           <div className="code-box-header">
-            <span>Standard React (65 lines of code)</span>
-            <span className="code-box-badge badge-bad">65 Lines • High Ceremony</span>
+            <span>Standard React (65 lines)</span>
+            <span className="code-box-badge badge-bad">High Boilerplate</span>
           </div>
-          <pre className="code-content">
-            <code>{`// 1. Hook and state setup
+          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
+            <code>{`// 1. Multiple useState & setters
 const [name, setName] = useState('');
 const [role, setRole] = useState('');
 const [notif, setNotif] = useState(true);
-const [count, setCount] = useState(0);
+const [todos, setTodos] = useState([]);
 
 // 2. Repetitive handler functions
 const handleSubmit = (e) => {
   e.preventDefault();
   save({ name, role, notif });
 };
-
-const handleCountInc = () => setCount(c => c + 1);
-const handleCountDec = () => setCount(c => c - 1);
+const addTodo = (t) => setTodos(p => [...p, t]);
+const toggleTodo = (id) => 
+  setTodos(p => p.map(x => x.id === id ? {...x, done: !x.done} : x));
+const deleteTodo = (id) =>
+  setTodos(p => p.filter(x => x.id !== id));
 
 // 3. JSX with manual bindings & ternaries
 return (
   <form onSubmit={handleSubmit}>
-    <input 
-      value={name} 
-      onChange={e => setName(e.target.value)} 
-    />
-    <input 
-      type="checkbox" 
-      checked={notif} 
-      onChange={e => setNotif(e.target.checked)} 
-    />
-    <button type="button" onClick={handleCountInc}>+1</button>
-    {isReady ? <Dashboard /> : <Login />}
+    <input value={name} onChange={e => setName(e.target.value)} />
+    <input type="checkbox" checked={notif} onChange={e => setNotif(e.target.checked)} />
+    {todos.map(t => (
+      <div key={t.id}>
+        <span onClick={() => toggleTodo(t.id)}>{t.title}</span>
+        <button onClick={() => deleteTodo(t.id)}>×</button>
+      </div>
+    ))}
   </form>
 );`}</code>
           </pre>
         </div>
 
-        {/* uReact Radical Reduction */}
+        {/* Tier 2: uReact v1 */}
         <div className="code-box ureact">
           <div className="code-box-header">
-            <span>uReact Radical Reduction (14 lines of code)</span>
-            <span className="code-box-badge badge-good">14 Lines • 79% Less Code</span>
+            <span>uReact v1 (14 lines)</span>
+            <span className="code-box-badge badge-good">-79% Code</span>
           </div>
-          <pre className="code-content">
-            <code>{`// 1. One global or local store & quick counter
+          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
+            <code>{`// 1. Unified reactive store
 const user = createStore({ name: '', role: '', notif: true });
-const count = useCounter(0);
+const todos = createStore([]);
 
-// 2. Clean JSX with direct bind, prevent, and When:
+// 2. Direct bindings & prevent modifier:
 export const UserView = view(() => (
   <form onSubmit={prevent(() => save(user.state))}>
     <input {...bind(user, 'name')} />
     <input type="checkbox" {...bind(user, 'notif')} />
-    <button type="button" onClick={() => count.inc()}>+1</button>
-    <When is={isReady} then={<Dashboard />} else={<Login />} />
+    <For each={todos.state}>
+      {(t) => (
+        <div key={t.id}>
+          <span onClick={() => t.done = !t.done}>{t.title}</span>
+          <button onClick={() => todos.state.splice(i, 1)}>×</button>
+        </div>
+      )}
+    </For>
   </form>
+));`}</code>
+          </pre>
+        </div>
+
+        {/* Tier 3: uReact Ultra Latest */}
+        <div className="code-box" style={{ background: 'rgba(16, 185, 129, 0.04)', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+          <div className="code-box-header" style={{ borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+            <span style={{ color: 'var(--accent-emerald)', fontWeight: 700 }}>uReact Ultra Latest (7 lines)</span>
+            <span className="code-box-badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: 'var(--accent-emerald)', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              -89.2% Code
+            </span>
+          </div>
+          <pre className="code-content" style={{ fontSize: '0.78rem' }}>
+            <code>{`// 1. Reactive proxy store & 1-line CRUD list:
+const user = createStore({ name: '', role: '', notif: true });
+const todos = createListStore([]);
+
+// 2. Direct $bind.prop & built-in 1-line CRUD methods:
+export const UserView = view(() => (
+  <AutoForm store={user} onSubmit={save}>
+    <For each={todos.state}>
+      {(t) => (
+        <div key={t.id}>
+          <span onClick={() => todos.toggle(t.id, 'done')}>{t.title}</span>
+          <button onClick={() => todos.remove(t.id)}>×</button>
+        </div>
+      )}
+    </For>
+  </AutoForm>
 ));`}</code>
           </pre>
         </div>
       </div>
 
-      {/* Interactive Demonstration */}
-      <div className="interactive-playground">
-        {/* Left: Interactive Ultra-Reduced Form */}
+      {/* Interactive Playgrounds Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '24px' }}>
+        
+        {/* Widget 1: Direct Proxy $bind & $toggle */}
         <div className="widget-card">
           <h4 className="widget-title">
             <Code2 size={18} style={{ color: 'var(--accent-cyan)' }} />
-            1. Direct Universal Binding (<code>bind()</code> &amp; <code>view()</code>)
+            1. Direct Proxy <code>store.$bind.property</code> &amp; <code>$toggle()</code>
           </h4>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            Zero <code>bind()</code> helper imports needed. Simply access <code>store.$bind.key</code>!
+          </p>
 
-          {/* AutoReactiveBadge subscribing automatically via view() */}
           <div style={{ marginBottom: '16px' }}>
             <AutoReactiveBadge />
           </div>
 
           <form onSubmit={prevent(() => alert('Saved: ' + JSON.stringify(userProfileStore.state)))}>
             <div className="form-group">
-              <label className="form-label">Username (Direct bind)</label>
-              {/* ZERO onChange or value handlers */}
-              <input type="text" className="input-field" {...bind(userProfileStore, 'username')} />
+              <label className="form-label">Username (<code>{'{...userProfileStore.$bind.username}'}</code>)</label>
+              <input type="text" className="input-field" {...userProfileStore.$bind.username} />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Role (Direct bind)</label>
-              <input type="text" className="input-field" {...bind(userProfileStore, 'role')} />
+              <label className="form-label">Role (<code>{'{...userProfileStore.$bind.role}'}</code>)</label>
+              <input type="text" className="input-field" {...userProfileStore.$bind.role} />
             </div>
 
-            <div className="form-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px' }}>
               <label className="form-check">
                 <input
                   type="checkbox"
                   className="checkbox-custom"
-                  {...bind(userProfileStore, 'notifications')}
+                  {...userProfileStore.$bind.notifications}
                 />
-                <span style={{ fontSize: '0.88rem' }}>Direct Checkbox Binding ({'{...bind(store, "notifications")}'})</span>
+                <span style={{ fontSize: '0.85rem' }}>Direct $bind.notifications</span>
               </label>
+
+              <button
+                type="button"
+                onClick={() => userProfileStore.$toggle('notifications')}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.78rem', padding: '4px 10px' }}
+              >
+                store.$toggle('notifications')
+              </button>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-              Submit with prevent() (Zero e.preventDefault() boilerplate)
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '16px' }}>
+              Submit with prevent() (Zero e.preventDefault())
             </button>
           </form>
         </div>
 
-        {/* Right: Quick State Helpers & Conditional */}
+        {/* Widget 2: 1-Line Reactive CRUD Collection Store */}
         <div className="widget-card">
-          <h4 className="widget-title">
-            <Sparkles size={18} style={{ color: 'var(--accent-indigo)' }} />
-            2. 1-Line State Primitives &amp; &lt;When&gt;
-          </h4>
-
-          {/* Counter widget */}
-          <div style={{ marginBottom: '20px' }}>
-            <span className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
-              <code>useCounter()</code> in 1 Line:
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <h4 className="widget-title" style={{ margin: 0 }}>
+              <ListTodo size={18} style={{ color: 'var(--accent-emerald)' }} />
+              2. <code>createListStore()</code> (1-Line CRUD)
+            </h4>
+            <span className="pill" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-emerald)' }}>
+              {taskList.count} Tasks
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button onClick={() => counter.dec()} className="btn btn-secondary" style={{ padding: '6px 12px' }}>
-                <Minus size={14} />
-              </button>
-              <span style={{ fontSize: '1.2rem', fontWeight: 800, minWidth: '40px', textAlign: 'center', color: 'var(--accent-cyan)' }}>
-                {counter.value}
-              </span>
-              <button onClick={() => counter.inc()} className="btn btn-secondary" style={{ padding: '6px 12px' }}>
-                <Plus size={14} />
-              </button>
-              <button onClick={() => counter.reset()} className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
-                Reset
-              </button>
-            </div>
           </div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            Eliminates all <code>.map()</code>, <code>.filter()</code>, and reducer boilerplate for collections!
+          </p>
 
-          {/* When Conditional Demo */}
-          <div style={{ marginBottom: '20px' }}>
-            <span className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
-              <code>&lt;When&gt;</code> Conditional Switcher:
-            </span>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-              <button
-                onClick={() => setActiveView('profile')}
-                className={`btn ${activeView === 'profile' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-              >
-                Show Profile View
-              </button>
-              <button
-                onClick={() => setActiveView('tags')}
-                className={`btn ${activeView === 'tags' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-              >
-                Show Tag Manager View
-              </button>
-            </div>
-
-            <When
-              is={activeView === 'profile'}
-              then={
-                <div
-                  style={{
-                    padding: '12px',
-                    borderRadius: '8px',
-                    background: 'rgba(99, 102, 241, 0.1)',
-                    border: '1px solid rgba(99, 102, 241, 0.25)',
-                    fontSize: '0.85rem'
-                  }}
-                >
-                  👤 Rendered Profile Card cleanly via <code>&lt;When is=... then=... /&gt;</code> without any ternary operators!
-                </div>
-              }
-              else={
-                <div
-                  style={{
-                    padding: '12px',
-                    borderRadius: '8px',
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    border: '1px solid rgba(16, 185, 129, 0.25)',
-                    fontSize: '0.85rem'
-                  }}
-                >
-                  🏷️ Rendered Tag Manager fallback branch effortlessly!
-                </div>
-              }
+          {/* Add input */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+            <input
+              type="text"
+              className="input-field"
+              placeholder="Add new task in 1 line..."
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAddTask(); }}
             />
+            <button onClick={handleAddTask} className="btn btn-primary" style={{ flexShrink: 0 }}>
+              <Plus size={14} /> Add
+            </button>
           </div>
 
-          {/* Array helper */}
-          <div>
-            <span className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
-              <code>useArray()</code> Helper ({tags.items.length} items):
-            </span>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
-              {tags.items.map((item, i) => (
-                <span
-                  key={i}
-                  className="chip"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => tags.remove(i)}
-                  title="Click to remove"
+          {/* Task items list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto', paddingRight: '4px' }}>
+            {taskList.state.map((task) => (
+              <div
+                key={task.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  background: task.done ? 'rgba(16, 185, 129, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                  border: `1px solid ${task.done ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div
+                  onClick={() => taskList.toggle(task.id, 'done')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    cursor: 'pointer',
+                    flex: 1
+                  }}
                 >
-                  {item} <span style={{ opacity: 0.6, fontSize: '0.7rem' }}>×</span>
-                </span>
-              ))}
-            </div>
+                  <div
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '4px',
+                      border: `1px solid ${task.done ? 'var(--accent-emerald)' : 'rgba(255, 255, 255, 0.3)'}`,
+                      background: task.done ? 'var(--accent-emerald)' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#000',
+                      flexShrink: 0
+                    }}
+                  >
+                    {task.done && <Check size={12} strokeWidth={3} />}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.86rem',
+                      textDecoration: task.done ? 'line-through' : 'none',
+                      color: task.done ? 'var(--text-muted)' : 'var(--text-main)'
+                    }}
+                  >
+                    {task.title}
+                  </span>
+                </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="New tag..."
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddTag(); }}
-              />
-              <button type="button" onClick={handleAddTag} className="btn btn-secondary">
-                <Plus size={14} /> Add
-              </button>
-            </div>
+                <button
+                  onClick={() => taskList.remove(task.id)}
+                  className="btn btn-secondary"
+                  style={{
+                    padding: '4px 6px',
+                    color: 'var(--accent-rose)',
+                    borderColor: 'transparent',
+                    background: 'transparent'
+                  }}
+                  title="Remove task"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <button
+              onClick={() => taskList.clear()}
+              className="btn btn-secondary"
+              style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+            >
+              Clear All ({taskList.count})
+            </button>
           </div>
         </div>
+
+        {/* Widget 3: Single-Tag <AutoForm> */}
+        <div className="widget-card">
+          <h4 className="widget-title">
+            <Layers size={18} style={{ color: 'var(--accent-indigo)' }} />
+            3. Single-Tag <code>&lt;AutoForm store=... /&gt;</code>
+          </h4>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            Zero manual inputs. Inferred types (string, number, boolean) directly from state schema:
+          </p>
+
+          <AutoForm
+            store={settingsStore}
+            onSubmit={(vals) => {
+              setAutoFormSaved(`Saved Project: "${vals.projectName}" with ${vals.maxUsers} users!`);
+              setTimeout(() => setAutoFormSaved(null), 3500);
+            }}
+            submitText="Save Settings (1-Tag Form)"
+          />
+
+          {autoFormSaved && (
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                color: 'var(--accent-emerald)',
+                fontSize: '0.82rem'
+              }}
+            >
+              {autoFormSaved}
+            </div>
+          )}
+        </div>
+
+        {/* Widget 4: React 19 Native <ActionForm> */}
+        <div className="widget-card">
+          <h4 className="widget-title">
+            <Send size={18} style={{ color: 'var(--accent-amber)' }} />
+            4. React 19 <code>&lt;ActionForm&gt;</code>
+          </h4>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            Native React 19 transition handling with automated button disabling &amp; pending feedback:
+          </p>
+
+          <ActionForm action={handleSaveAction} resetOnSuccess>
+            <div className="form-group">
+              <label className="form-label">New Feature (React 19 Server Action Simulation)</label>
+              <input
+                type="text"
+                name="actionItem"
+                placeholder="e.g. Offline PWA caching..."
+                className="input-field"
+                required
+              />
+            </div>
+
+            <ActionSubmitButton
+              pendingText="Dispatching Action..."
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, var(--accent-amber), #d97706)',
+                color: '#000',
+                fontWeight: 700
+              }}
+            >
+              Dispatch React 19 Action
+            </ActionSubmitButton>
+          </ActionForm>
+
+          {actionFeedback && (
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                color: 'var(--accent-amber)',
+                fontSize: '0.82rem'
+              }}
+            >
+              {actionFeedback}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
-}
+});

@@ -82,7 +82,7 @@ export function App() {
               <Keyboard size={14} /> Shortcuts Menu (Ctrl+K)
             </button>
             <div className="pill" style={{ background: 'rgba(99, 102, 241, 0.15)', borderColor: 'rgba(99, 102, 241, 0.3)', color: '#c7d2fe' }}>
-              <Package size={14} /> v2.0.0 (React 19)
+              <Package size={14} /> v2.1.0 (Ultra Reducer)
             </div>
             <div className="pill active">
               <Cpu size={14} /> Powered by React 19 Engine
@@ -175,7 +175,7 @@ export function App() {
             className={`tab-btn ${activeTab === 'reduction' ? 'active' : ''}`}
             onClick={() => setActiveTab('reduction')}
           >
-            <Minimize2 size={16} /> Code Reducer (-79%)
+            <Minimize2 size={16} /> Code Reducer (-89%)
           </button>
           <button
             className={`tab-btn ${activeTab === 'underTheHood' ? 'active' : ''}`}

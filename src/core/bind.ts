@@ -1,12 +1,7 @@
 import { ChangeEvent } from 'react';
-import { Store } from './types';
+import { Store, AutoBinding } from './types';
 
-export interface AutoBinding {
-  name: string;
-  value?: any;
-  checked?: boolean;
-  onChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | any) => void;
-}
+export type { AutoBinding };
 
 /**
  * Universal Two-Way Binding helper.
