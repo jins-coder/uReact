@@ -75,6 +75,20 @@ export const DOC_CATEGORIES: DocCategory[] = [
           { id: 'reactive-watcher', text: '3. State Watcher (watch)' },
           { id: 'devtools-hud', text: '4. DevTools HUD & Inspector' }
         ]
+      },
+      {
+        id: 'compiler',
+        path: '/docs/compiler',
+        title: 'Zero-Runtime Compiler',
+        badge: 'v3.0 AOT',
+        badgeType: 'new',
+        description: 'Ahead-of-time compiler: atomic __patch, JSX signal DOM pruning, and Vite plugin.',
+        toc: [
+          { id: 'compiler-overview', text: '1. Compiler Architecture' },
+          { id: 'live-studio', text: '2. Live AST Studio' },
+          { id: 'benchmarks', text: '3. Mutation Benchmark' },
+          { id: 'vite-config', text: '4. Vite & Rollup Config' }
+        ]
       }
     ]
 

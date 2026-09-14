@@ -209,5 +209,25 @@
       "export const ${1:SafeComponent} = isolate(${2:UnsafeComponent});"
     ],
     "description": "Wrap a component with isolate() HOC for automatic fault isolation and recovery"
+  },
+  "uReact SignalValue Component": {
+    "prefix": "ursignalval",
+    "body": [
+      "<SignalValue signal={${1:counter}} />"
+    ],
+    "description": "Fine-grained text node bound directly to a signal without re-rendering the parent component"
+  },
+  "uReact AOT Compiler Plugin": {
+    "prefix": "urviteplugin",
+    "body": [
+      "ureactCompilerPlugin({",
+      "  optimizeMutations: true,",
+      "  signalDomPruning: true,",
+      "  compileTwoWayBind: true,",
+      "  autoView: true",
+      "})"
+    ],
+    "description": "Add uReact v3.0 Ahead-of-Time compiler plugin to vite.config.ts"
   }
 }
+

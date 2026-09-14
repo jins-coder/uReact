@@ -94,7 +94,7 @@ Despite React's dominance, developers across the community have spent the last d
 ```
 v2.3.0 (Current)
   │
-  ├──► RFC-01: Ahead-of-Time Zero-Runtime Compiler (Babel / Vite / SWC)
+  ├──► RFC-01: Ahead-of-Time Zero-Runtime Compiler [SHIPPED in v3.0 Preview]
   │
   ├──► RFC-02: RSC Direct Flight Stream Store Synchronization
   │

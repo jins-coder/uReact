@@ -27,6 +27,7 @@ import { PlaygroundPage } from './docs/pages/PlaygroundPage';
 import { RoadmapPage } from './docs/pages/RoadmapPage';
 import { DevFeaturesPage } from './docs/pages/DevFeaturesPage';
 import { DevToolsPage } from './docs/pages/DevToolsPage';
+import { CompilerPage } from './docs/pages/CompilerPage';
 import { RoadmapModal } from './components/RoadmapModal';
 
 
@@ -136,6 +137,8 @@ export function App() {
         return <DevFeaturesPage />;
       case 'devtools':
         return <DevToolsPage />;
+      case 'compiler':
+        return <CompilerPage />;
       default:
         return <QuickstartPage />;
 

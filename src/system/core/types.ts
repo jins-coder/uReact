@@ -25,6 +25,10 @@ export interface Store<T extends object> {
   $bind: StoreBindingProxy<T>;
   /** Toggle a boolean property in-place */
   $toggle: (property: keyof T) => void;
+  /** AOT Compiler Direct Patch: bypasses Proxy traps and updates atom directly */
+  __patch: (path: (string | number)[], valueOrMutator: any) => void;
+  /** Public direct path patch alias */
+  $patch: (path: (string | number)[], valueOrMutator: any) => void;
 }
 
 export interface Signal<T> {

@@ -166,6 +166,27 @@ export function createStore<T extends object>(initialState: T): Store<T> {
     },
     $toggle(prop: keyof T) {
       (proxyState as any)[prop] = !(proxyState as any)[prop];
+    },
+    __patch(path: (string | number)[], valueOrMutator: any) {
+      if (!path || path.length === 0) return;
+      let curr: any = rawState;
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        if (curr[key] === undefined || curr[key] === null || typeof curr[key] !== 'object') {
+          curr[key] = typeof path[i + 1] === 'number' ? [] : {};
+        }
+        curr = curr[key];
+      }
+      const lastKey = path[path.length - 1];
+      const prevVal = curr[lastKey];
+      const newVal = typeof valueOrMutator === 'function' ? valueOrMutator(prevVal) : valueOrMutator;
+      if (prevVal !== newVal) {
+        curr[lastKey] = newVal;
+        updateSnapshot();
+      }
+    },
+    $patch(path: (string | number)[], valueOrMutator: any) {
+      storeInstance.__patch(path, valueOrMutator);
     }
   };
 
